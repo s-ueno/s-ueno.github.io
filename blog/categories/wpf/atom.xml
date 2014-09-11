@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Wpf | uEN Laboratory]]></title>
+  <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
+  <link href="http://s-ueno.github.io/"/>
+  <updated>2014-09-11T13:24:27+09:00</updated>
+  <id>http://s-ueno.github.io/</id>
+  <author>
+    <name><![CDATA[uEN]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 01]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/09/11/wpf-01/"/>
+    <updated>2014-09-11T12:03:19+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/09/11/wpf-01</id>
+    <content type="html"><![CDATA[<p>LOB開発といえば企業が利用する業務システムで、Windows FormとSQLを利用して、あっという間にデータベースと連係して動くアプリケーションを作成できる技術者は多いと思います。</p>
+
+<p>そんなところに出てきたWPF(Windows Presentation Foundation)。<br/>
+とても優れた技術ですが、これをどうLOB開発として利用するかは少し敷居があるのかと感じています。</p>
+
+<p>『WPF ViewModelでLOB開発』シリーズでは、WPFの恩恵を十分に受けつつ、より簡単に開発するための情報を展開します。</p>
+
+<h2>WPFテクノロジー</h2>
+
+<p>技術詳細については<a href="http://msdn.microsoft.com/ja-jp">MSDN</a> か <a href="http://blogs.msdn.com/b/shozoa/">荒井省三さんのBlog</a> のWPF編を読むことをお勧めします。<br/>
+ここではVisualStudioを利用しながら動かすことに視点を合わせたいと思います。</p>
+
+<h2>ViewModel</h2>
+
+<p>ビューモデルと呼び、この連載タイトルの一部にも登場しています。<br/>
+<a href="http://ja.wikipedia.org/wiki/Model_View_ViewModel">Model-View-ViewModel</a> というデザイン パターンの中で、画面の状態を持つオブジェクトです。
+Wikiを読むと難しく早くも挫折しそうですが、手を動かしながら確認したいと思います。</p>
+
+<p>Visual Studioを起動して SimpleApp というWPFアプリケーションを作成
+<img src="images/wpf-01-01.png" alt="wpf-01-01" />
+<img src="images/wpf-01-02.png" alt="wpf-01-02" /></p>
+
+<p>自動でxamlが二つ生成されています。</p>
+
+<ul>
+<li>App.xaml
+
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.application.aspx">System.Windows.Application</a> クラスから派生し、WPFアプリを起動する役目を持ちます。
+　</li>
+</ul>
+</li>
+<li>MainWindowo.xaml
+
+<ul>
+<li>メイン画面で、Model-View-ViewModel でいうところの View になります。  今回は中央にSampleTextBoxという名前を付けたテキストボックスを配置しました。</li>
+</ul>
+</li>
+</ul>
+
+
+<pre><code> &lt;TextBox Name="SampleTextBox"/&gt;
+</code></pre>
+
+<p>ここに MainWindow の状態を持つための ViewModel を追加します。</p>
+
+<p><img src="images/wpf-01-03.png" alt="wpf-01-03" />
+<img src="images/wpf-01-04.png" alt="wpf-01-04" /></p>
+
+<p>Textという文字列型のプロパティを持ち、コンストラクタで初期化しています。</p>
+
+<pre><code>    class MainWindowViewModel
+    {
+        public MainWindowViewModel()
+        {
+            Text = "これはテスト文字列です。";
+        }
+        public string Text { get; set; }
+    }
+</code></pre>
+
+<p>次に MainWindow という ビュー が ビューモデル を利用してデータを表示するための設定を行います。</p>
+
+<p><img src="images/wpf-01-05.png" alt="wpf-01-05" /></p>
+
+<pre><code>    /// &lt;summary&gt;
+    /// MainWindow.xaml の相互作用ロジック
+    /// &lt;/summary&gt;
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            this.DataContext = new MainWindowViewModel();
+
+        }
+    }
+</code></pre>
+
+<p>DataContext というプロパティ名が表すように、ここに設定したオブジェクトがデータを表すということになります。<br/>
+これで ViewModel の設定は完了しました。</p>
+
+<p>ここからさらに各コントロール（ここではテキストボックスだけですが）の データ バインディング を行います。</p>
+
+<p><img src="images/wpf-01-06.png" alt="wpf-01-06" /></p>
+
+<pre><code>    this.SampleTextBox.SetBinding(TextBox.TextProperty, new Binding("Text"));
+</code></pre>
+
+<p>バインディングの方法は様々でXaml(ザムル)といわれる画面を構成するXML上で
+<code>&lt;TextBox Name="SampleTextBox" Text="{Binding Path=Text}"/&gt;</code>
+と記述することも可能ですが、ここでは意図してコード上でバインディングしています。</p>
+
+<p>TextBox.TextProperty は依存関係プロパティといい、このバインディングの仕組みは<a href="http://msdn.microsoft.com/ja-jp/library/ms752914.aspx">WPF プロパティ システム</a>と呼ばれます。
+Bindingクラスのコンストラクタ パラメーターは ViewModel のプロパティ名を設定しています。
+この状態でF5キーを押下してデバック実行すると・・・</p>
+
+<p><img src="images/wpf-01-07.png" alt="wpf-01-07" /></p>
+
+<p>表示されましたね！<br/>
+フレキシブル レイアウトで、テキストボックスは画面を大きくすると画面と一緒に大きくなります。</p>
+
+<p>画面での入力内容が、DataContext に設定したオブジェクトのプロパティに自動設定されるなどの一連のバインディングの仕組みが用意されており、
+この仕組みを利用するのが<a href="http://ja.wikipedia.org/wiki/Model_View_ViewModel">Model-View-ViewModel</a> デザイン パターンです。</p>
+
+<p>注目するのはMainWindowViewModelクラスで、UIから独立した素のクラスです。<br/>
+従来の画面とモデルを紐付けるよなグル(接着剤)コードがViewModel上には出てこなくなりました。</p>
+
+<h2>LOB開発基盤　-　ViewModel</h2>
+
+<p>さて、ここまでで発生した「おまじないコード」は・・・</p>
+
+<ul>
+<li>WindowのDataContextプロパティへの設定</li>
+<li>TextBox.TextPropertyという依存関係プロパティを利用したバインディング作業</li>
+</ul>
+
+
+<p>になります。<br/>
+まだまだ記述していないおまじないコードもあり、このままではLOB開発に展開できません。</p>
+
+<p>これらのおまじないコードを基底クラスと一連の機能に隠ぺいすることで、最終的にはViewModelで簡単に画面遷移できるようなソリューションになれれば、WPFの恩恵を受けながらLOB開発を進められるかも？！</p>
+
+<p>基盤はこれからのシリーズで少しずつ機能を固めていくので、まずは準備しましょう。
+まずは <a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.inotifypropertychanged.aspx">INotifyPropertyChanged</a> インターフェイスを実装したViewModelのベースクラスを準備します。</p>
+
+<p><img src="images/wpf-01-08.png" alt="wpf-01-08" /></p>
+
+<pre><code>    public abstract class BizViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+        protected bool SetProperty&lt;T&gt;(ref T storage, T value, 
+            [CallerMemberName] string propertyName = null)
+        {
+            if (object.Equals(storage, value))
+                return false;
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+    }
+</code></pre>
+
+<p>ソースコードは<a href="http://blogs.msdn.com/b/shozoa/">荒井省三さんのBlog</a>で紹介されているものを拝借しました。
+ポイントは二つで</p>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.inotifypropertychanged.aspx">INotifyPropertyChanged</a> インターフェイス</li>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.runtime.compilerservices.callermembernameattribute.aspx">CallerMemberName</a> 属性</li>
+</ul>
+
+
+<p>になります。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.inotifypropertychanged.aspx">INotifyPropertyChanged</a> インターフェイスは、データ バインディングの仕組みの一つで、何かの処理を実行してViewModelのプロパティに値をセットした場合、それをView側に通知する機能です。
+この仕組みで、画面上のデータが再描画されます。<br/>
+プロパティのsetで呼び出すようにします。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.runtime.compilerservices.callermembernameattribute.aspx">CallerMemberName</a> 属性は.Net4.5で新しく出てきた機能で、呼び出し元のメンバー名を自動設定してくれる機能です。
+少し前までは、プロパティのsetで <code>OnPropertyChanged("●×プロパティ名")</code> みたいにコーディングしていたのですが、その文字を記述する必要がなくなりました。
+.Net4.0以前では利用できませんが、必須な属性ではなく、文字列でプロパティ名をコーディングしていた世界から少しだけタイプセーフになりましたというところです。</p>
+
+<p>こういうおまじないコードをViewModelの基底クラスに準備しておくことにします。</p>
+
+<p>次にバインディングの作業です。
+先ほどタイプセーフと呼びましたが、なるべくコンパイラのチェックが働くようなコーディングだとソースコードの量が増えたときに便利です。
+そこで、バインディングのときにコーディングした</p>
+
+<pre><code>    new Binding("Text")
+</code></pre>
+
+<p>ここの&#8221;Text&#8221;というプロパティ名もタイプセーフにセットできるようにしたいと思います。</p>
+
+<p>これはWPFとは関係のない、ただの技術情報なのですが、<a href="http://msdn.microsoft.com/ja-jp/library/bb397687.aspx">ラムダ</a>というコーディングの記述方法があります。<br/>
+LINQが利用されるようになってきて、このラムダにおける型の推論によるコーディング方法も浸透してきたと思います。</p>
+
+<pre><code>    //LINQというのは、こんな感じ
+    IEnumerable&lt;Customer&gt; customers = customers.Where(c =&gt; c.City == "London");
+</code></pre>
+
+<p>C#の経験があるといってもラムダを初めてみる人は、 <code>c =&gt; c.City == "London"</code> の記述を見るとびっくりするかもしれませんが、VisualStudioでインテリセンスが働くので、すぐに慣れると思います。</p>
+
+<p>このラムダを利用して、タイプセーフにViewModelのプロパティ名を取得するような簡単なユーティリティを準備します。
+こういうのはすでに世の中に出回っているので、<a href="http://themechanicalbride.blogspot.jp/2007/03/symbols-in-c-30-reloaded.html">探せば出てきます</a>。</p>
+
+<pre><code>    public static class ExpressionExtensions
+    {
+        public static string ToPropertyName&lt;T&gt;(this T obj, Expression&lt;Func&lt;T, object&gt;&gt; expr)
+        {
+            return expr.ToSymbol();
+        }
+        public static string ToSymbol(this Expression expr)
+        {
+            if (expr == null)
+                return null;
+
+            var memExp = (expr as LambdaExpression).Body as MemberExpression;
+            var list = new List&lt;string&gt;();
+            while (memExp is MemberExpression)
+            {
+                list.Add(memExp.Member.Name);
+                memExp = memExp.Expression as MemberExpression;
+            }
+            return string.Join(".", list.Reverse&lt;string&gt;());
+        }
+    }
+</code></pre>
+
+<p>あとは MainWindowViewModel のベースクラスを BizViewModel として</p>
+
+<pre><code>    class MainWindowViewModel : BizViewModel
+    {
+        public MainWindowViewModel()
+        {
+            Text = "これはテスト文字列です。";
+        }
+        public string Text
+        {
+            get { return text; }
+            set
+            {
+                SetProperty(ref text, value);
+            }
+        }
+        private string text; 
+    }
+</code></pre>
+
+<p>さっきのユーティリティを利用すると</p>
+
+<p><img src="images/wpf-01-09.png" alt="wpf-01-09" /></p>
+
+<pre><code>    /// &lt;summary&gt;
+    /// MainWindow.xaml の相互作用ロジック
+    /// &lt;/summary&gt;
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            var viewModel = new MainWindowViewModel();
+            this.DataContext = viewModel;
+
+            var textPropertyName = viewModel.ToPropertyName(x =&gt; x.Text);
+            this.SampleTextBox.SetBinding(TextBox.TextProperty, new Binding(textPropertyName));
+        }
+    }
+</code></pre>
+
+<p>これでコンパイラでチェックがかかるタイプセーフなWPFの簡単な基盤ができました。
+イベント系などは次回紹介するとして、今はViewおよびViewModelの役割を設定していきたいと思います。</p>
+
+<h2>LOB開発基盤　-　View</h2>
+
+<p>次にViewについて少し掘り下げいきます。
+今はWindowのXamlに直接記述しています。</p>
+
+<pre><code>&lt;Window x:Class="SimpleApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525"&gt;
+    &lt;Grid&gt;
+        &lt;TextBox Name="SampleTextBox"/&gt;
+    &lt;/Grid&gt;
+&lt;/Window&gt;
+</code></pre>
+
+<p>Windowタグの中には一つのコンテンツのみを配置できます。<br/>
+今は <code>&lt;Grid&gt;</code> が配置されています。コードで記述すると</p>
+
+<pre><code>    /// &lt;summary&gt;
+    /// MainWindow.xaml の相互作用ロジック
+    /// &lt;/summary&gt;
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+
+            this.Content = new Grid();
+</code></pre>
+
+<p>なので、コンテンツは一つのみとなります。
+ただしWPFの拡張機能によって、このコンテンツがどのように描画されるかは変わってきます。</p>
+
+<p>試しにデバック実行し、WPFビジュアライザーで確認してみると</p>
+
+<p><img src="images/wpf-01-10.png" alt="wpf-01-10" /></p>
+
+<p>MainWindowの中にあるContentPresenterにGridが配置されています。<br/>
+別の機会に詳しく紹介しますが、WPFの<a href="http://msdn.microsoft.com/ja-jp/library/ms745683.aspx">Style</a>が適用されている結果このような表示になります。</p>
+
+<p>少し前までAero.NormalColor.xamlなどスタイルがMSDNからダウンロードできたのですが、リンクが見つかりませんでした。
+現在のデバック実行した環境でWindowクラスに適用されているスタイルは、以下のようになっているのだと思います。</p>
+
+<pre><code>    &lt;Style x:Key="{x:Type Window}"
+           TargetType="{x:Type Window}"&gt;
+        &lt;Setter Property="Foreground"
+                Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/&gt;
+        &lt;Setter Property="Background"
+                Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/&gt;
+        &lt;Setter Property="Template"&gt;
+            &lt;Setter.Value&gt;
+                &lt;ControlTemplate TargetType="{x:Type Window}"&gt;
+                    &lt;Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"&gt;
+                        &lt;AdornerDecorator&gt;
+                            &lt;ContentPresenter/&gt;
+                        &lt;/AdornerDecorator&gt;
+                    &lt;/Border&gt;
+                &lt;/ControlTemplate&gt;
+            &lt;/Setter.Value&gt;
+        &lt;/Setter&gt;
+</code></pre>
+
+<p>TemplateというWPFの外観をカスタマイズできる機能があり、ここにコンテンツを表示する際はBorderを用意して、AdornerDecoratorを用意してその中にContentPresenterを・・・という風に定義されています。</p>
+
+<p>話を戻すと、Windowに表示されるコンテンツは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.contentpresenter.aspx">ContentPresenter</a>を利用して表示されるようになっています。</p>
+
+<p>MSDNの<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.contentpresenter.aspx">ContentPresenter</a>をみると、コンテンツがどのようなロジックで表示するかの記述があります。
+たとえば、コンテンツに文字列を設定するとTextBlockが自動で作成されて、表示されるようになります。</p>
+
+<p><img src="images/wpf-01-11.png" alt="wpf-01-11" /></p>
+
+<p><img src="images/wpf-01-12.png" alt="wpf-01-12" /></p>
+
+<p>F5キーでデバック実行</p>
+
+<p><img src="images/wpf-01-13.png" alt="wpf-01-13" /></p>
+
+<p>任意のクラスの場合はToStringの結果が表示されるのですが、その場合に何を表示すべきかをカスタマイズする機能があります。</p>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.contentcontrol.contenttemplateselector.aspx">ContentControl.ContentTemplateSelector</a> プロパティ</li>
+</ul>
+
+
+<p>試しにContentTemplateSelectorプロパティに設定して動作確認してみましょう。</p>
+
+<p><img src="images/wpf-01-14.png" alt="wpf-01-14" /></p>
+
+<p>戻り値の<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.datatemplate.aspx">DataTemplate</a>はビジュアル要素（つまりView）をあらわし、引数のitemは任意のデータをあらわします。<br/>
+この仕組みの面白いところは、<strong>データがビジュアル要素を決定する</strong>というところです。
+つまり、ビジュアル要素はデータの属性として表現すると、仕組みを上手に利用できそうだとわかります。</p>
+
+<p>さっそくオブジェクトとしてそれを表現してみたいと思います。<br/>
+ビジュアル要素はデータの属性として扱うので</p>
+
+<pre><code>    public class VisualElementsAttribute : Attribute
+    {
+        public VisualElementsAttribute(Type visualType)
+        {
+            VisualType = visualType;
+        }
+        public Type VisualType { get; private set; }
+    }
+</code></pre>
+
+<p>この属性はデータ（BizViewModelから派生した任意のViewModel）に付与することになります。<br/>
+次にビジュアル要素（ビュー）用の基底クラスを用意します。</p>
+
+<pre><code>    public abstract class BizView : UserControl
+    {
+        protected BizView()
+        {
+            DataContextChanged += OnBizViewDataContextChanged;
+        }
+        private void OnBizViewDataContextChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
+        {
+            BuildBinding();
+        }
+        protected virtual void BuildBinding()
+        {
+
+        }
+    }
+</code></pre>
+
+<p>上記二つを利用して、BizViewModelに肉付けします。</p>
+
+<pre><code>    public abstract class BizViewModel : INotifyPropertyChanged
+    {
+        protected BizViewModel()
+        {
+            if (VisualElements != null)
+            {
+                View = Activator.CreateInstance(VisualElements.VisualType) as BizView;
+            }
+        }
+        private VisualElementsAttribute visualElements;
+        public VisualElementsAttribute VisualElements
+        {
+            get
+            {
+                if (visualElements == null)
+                {
+                    visualElements = this.GetType()
+                                         .GetCustomAttributes(typeof(VisualElementsAttribute), false)
+                                         .FirstOrDefault() as VisualElementsAttribute;
+                }
+                return visualElements;
+            }
+        }
+        private BizView view;
+        public BizView View
+        {
+            get { return view; }
+            set
+            {
+                view = value;
+                view.DataContext = this;
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+        protected bool SetProperty&lt;T&gt;(ref T storage, T value,
+            [CallerMemberName] string propertyName = null)
+        {
+            if (object.Equals(storage, value))
+                return false;
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+            return true;
+        }
+    }
+</code></pre>
+
+<p>先ほどDataTemplateSelectorを派生した動作確認用のサンプルを作成しましたが、正しくビジュアル要素を返すDataTemplateSelectorを作成します。</p>
+
+<pre><code>    public class ViewDataTemplateSelector : DataTemplateSelector
+    {
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            var vm = item as BizViewModel;
+            if (vm == null || vm.VisualElements == null)
+                return base.SelectTemplate(item, container);
+
+            var template = new DataTemplate() { VisualTree = new FrameworkElementFactory(vm.VisualElements.VisualType) };
+            template.Seal();
+            return template;
+        }
+    }
+</code></pre>
+
+<p>ここまででのLOB開発用の基盤は以下のようになっています。</p>
+
+<p><img src="images/wpf-01-15.png" alt="wpf-01-15" /></p>
+
+<p>これを早速使って画面を表示したいと思います。</p>
+
+<h2>LOB開発基盤　-　はじめの一歩</h2>
+
+<p>コンテンツもViewModelも何もない空のMainWindowのみの状態です。</p>
+
+<p><img src="images/wpf-01-16.png" alt="wpf-01-16" /></p>
+
+<p>ここにViewを追加します。</p>
+
+<p><img src="images/wpf-01-17.png" alt="wpf-01-17" /></p>
+
+<p>名前はMainViewで、WPFのユーザーコントロールで追加します。<br/>
+VisualStudioにはItemTemplatesフォルダがあって、これを利用すると便利なのですが、それは次回に紹介します。</p>
+
+<p>MainViewクラスのベースクラスをBizViewに変更します。</p>
+
+<p><img src="images/wpf-01-18.png" alt="wpf-01-18" /></p>
+
+<p>この作業に今は手間がかかりますが、ItemTemplateを紹介するまでの我慢です。</p>
+
+<p>MainView.xamlに先ほど作成した基盤の名前空間をインポート<code>xmlns:uen="clr-namespace:uEN.UI;assembly=uEN"</code>して、メインのタグを<code>&lt;uen:BizView</code>に変更します。<br/>
+合わせてMainView.xaml.csのベースクラスも<code>BizView</code>に変更します。</p>
+
+<p>このViewに先ほどと同じようにテキストボックスを配置します。</p>
+
+<p><img src="images/wpf-01-19.png" alt="wpf-01-19" /></p>
+
+<p>次にMainViewModelを追加します。</p>
+
+<p><img src="images/wpf-01-20.png" alt="wpf-01-20" /></p>
+
+<pre><code>    [VisualElements(typeof(MainView))]
+    public class MainViewModel : BizViewModel
+    {
+        public MainViewModel()
+        {
+            MyProperty = "ViewModelでLob開発";
+        }
+        public string MyProperty { get; set; }
+    }
+</code></pre>
+
+<p>このViewModelをMainViewのBuildBindingでデータバインディングします。</p>
+
+<pre><code>    /// &lt;summary&gt;
+    /// MainView.xaml の相互作用ロジック
+    /// &lt;/summary&gt;
+    public partial class MainView : BizView
+    {
+        public MainView()
+        {
+            InitializeComponent();
+        }
+
+        protected override void BuildBinding()
+        {
+            var viewModel = this.DataContext as MainViewModel;
+            var propertyName = viewModel.ToPropertyName(x =&gt; x.MyProperty);
+            this.SampleTextBox.SetBinding(TextBox.TextProperty, new Binding(propertyName));
+        }
+    }
+</code></pre>
+
+<p>今は空のMainWindowとMainView/MainViewModelがある状態です。</p>
+
+<p><img src="images/wpf-01-21.png" alt="wpf-01-21" /></p>
+
+<p>最後にMainWindowにコンテンツとセレクターを設定します。</p>
+
+<pre><code>    /// &lt;summary&gt;
+    /// MainWindow.xaml の相互作用ロジック
+    /// &lt;/summary&gt;
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            this.Content = new MainViewModel();
+            this.ContentTemplateSelector = new ViewDataTemplateSelector();
+        }
+    }
+</code></pre>
+
+<p>以上で準備が完了です。<br/>
+デバック実行すると・・・</p>
+
+<p><img src="images/wpf-01-22.png" alt="wpf-01-22" /></p>
+
+<p>期待した結果が表示されました！</p>
+
+<p>WPFの「おまじないコード」などを基盤に入れていくと、それを利用するLOB開発は楽になると思います。<br/>
+たとえば</p>
+
+<ul>
+<li>BizViewModelにShowメソッドを用意し、WindowをNewするコードを入れれば・・・</li>
+<li>コマンドのバインディングのラッパーを・・・</li>
+<li>ロギングが・・・</li>
+</ul>
+
+
+<p>思いつくままをオレオレ実装してもいいですし、<a href="http://www.microsoft.com/ja-jp/dev/2010/solutions/architecture/default.aspx">Application Architecture Guide</a>などを読み解いて、しかるべき処理を準備していくのも一つかもしれません。</p>
+
+<p>次回は今までの作業で手間だったものの自動化を考えてItemTemplateの紹介と、もう少し踏み込んでボタンを押して動くところまでもっていければと思います。</p>
+
+<p>今回のサンプルは<a href="images/uEN-Vol01.zip">コチラ</a></p>
+
+<hr />
+]]></content>
+  </entry>
+  
+</feed>

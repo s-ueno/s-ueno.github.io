@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://s-ueno.github.io/sitemap.xml 
