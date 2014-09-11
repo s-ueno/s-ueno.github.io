@@ -144,8 +144,8 @@
 Wikiを読むと難しく早くも挫折しそうですが、手を動かしながら確認したいと思います。</p>
 
 <p>Visual Studioを起動して SimpleApp というWPFアプリケーションを作成
-<img src="images/wpf-01-01.png" alt="wpf-01-01" />
-<img src="images/wpf-01-02.png" alt="wpf-01-02" /></p>
+<img src="http://s-ueno.github.io/images/wpf-01-01.png" alt="wpf-01-01" />
+<img src="http://s-ueno.github.io/images/wpf-01-02.png" alt="wpf-01-02" /></p>
 
 <p>自動でxamlが二つ生成されています。</p>
 
@@ -172,8 +172,8 @@ Wikiを読むと難しく早くも挫折しそうですが、手を動かしな�
 
 <p>ここに MainWindow の状態を持つための ViewModel を追加します。</p>
 
-<p><img src="images/wpf-01-03.png" alt="wpf-01-03" />
-<img src="images/wpf-01-04.png" alt="wpf-01-04" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-03.png" alt="wpf-01-03" />
+<img src="http://s-ueno.github.io/images/wpf-01-04.png" alt="wpf-01-04" /></p>
 
 <p>Textという文字列型のプロパティを持ち、コンストラクタで初期化しています。</p>
 
@@ -197,7 +197,7 @@ Wikiを読むと難しく早くも挫折しそうですが、手を動かしな�
 
 <p>次に MainWindow という ビュー が ビューモデル を利用してデータを表示するための設定を行います。</p>
 
-<p><img src="images/wpf-01-05.png" alt="wpf-01-05" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-05.png" alt="wpf-01-05" /></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -232,7 +232,7 @@ Wikiを読むと難しく早くも挫折しそうですが、手を動かしな�
 
 <p>ここからさらに各コントロール（ここではテキストボックスだけですが）の データ バインディング を行います。</p>
 
-<p><img src="images/wpf-01-06.png" alt="wpf-01-06" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-06.png" alt="wpf-01-06" /></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>this.SampleTextBox.SetBinding(TextBox.TextProperty, new Binding("Text"));</span></code></pre></td></tr></table></div></figure>
@@ -246,7 +246,7 @@ Wikiを読むと難しく早くも挫折しそうですが、手を動かしな�
 Bindingクラスのコンストラクタ パラメーターは ViewModel のプロパティ名を設定しています。
 この状態でF5キーを押下してデバック実行すると・・・</p>
 
-<p><img src="images/wpf-01-07.png" alt="wpf-01-07" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-07.png" alt="wpf-01-07" /></p>
 
 <p>表示されましたね！<br/>
 フレキシブル レイアウトで、テキストボックスは画面を大きくすると画面と一緒に大きくなります。</p>
@@ -275,7 +275,7 @@ Bindingクラスのコンストラクタ パラメーターは ViewModel のプ�
 <p>基盤はこれからのシリーズで少しずつ機能を固めていくので、まずは準備しましょう。
 まずは <a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.inotifypropertychanged.aspx">INotifyPropertyChanged</a> インターフェイスを実装したViewModelのベースクラスを準備します。</p>
 
-<p><img src="images/wpf-01-08.png" alt="wpf-01-08" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-08.png" alt="wpf-01-08" /></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -445,7 +445,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 <p>さっきのユーティリティを利用すると</p>
 
-<p><img src="images/wpf-01-09.png" alt="wpf-01-09" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-09.png" alt="wpf-01-09" /></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -537,7 +537,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 <p>試しにデバック実行し、WPFビジュアライザーで確認してみると</p>
 
-<p><img src="images/wpf-01-10.png" alt="wpf-01-10" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-10.png" alt="wpf-01-10" /></p>
 
 <p>MainWindowの中にあるContentPresenterにGridが配置されています。<br/>
 別の機会に詳しく紹介しますが、WPFの<a href="http://msdn.microsoft.com/ja-jp/library/ms745683.aspx">Style</a>が適用されている結果このような表示になります。</p>
@@ -592,13 +592,13 @@ LINQが利用されるようになってきて、このラムダにおける型�
 <p>MSDNの<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.contentpresenter.aspx">ContentPresenter</a>をみると、コンテンツがどのようなロジックで表示するかの記述があります。
 たとえば、コンテンツに文字列を設定するとTextBlockが自動で作成されて、表示されるようになります。</p>
 
-<p><img src="images/wpf-01-11.png" alt="wpf-01-11" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-11.png" alt="wpf-01-11" /></p>
 
-<p><img src="images/wpf-01-12.png" alt="wpf-01-12" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-12.png" alt="wpf-01-12" /></p>
 
 <p>F5キーでデバック実行</p>
 
-<p><img src="images/wpf-01-13.png" alt="wpf-01-13" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-13.png" alt="wpf-01-13" /></p>
 
 <p>任意のクラスの場合はToStringの結果が表示されるのですが、その場合に何を表示すべきかをカスタマイズする機能があります。</p>
 
@@ -609,7 +609,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 <p>試しにContentTemplateSelectorプロパティに設定して動作確認してみましょう。</p>
 
-<p><img src="images/wpf-01-14.png" alt="wpf-01-14" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-14.png" alt="wpf-01-14" /></p>
 
 <p>戻り値の<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.datatemplate.aspx">DataTemplate</a>はビジュアル要素（つまりView）をあらわし、引数のitemは任意のデータをあらわします。<br/>
 この仕組みの面白いところは、<strong>データがビジュアル要素を決定する</strong>というところです。
@@ -809,7 +809,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 <p>ここまででのLOB開発用の基盤は以下のようになっています。</p>
 
-<p><img src="images/wpf-01-15.png" alt="wpf-01-15" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-15.png" alt="wpf-01-15" /></p>
 
 <p>これを早速使って画面を表示したいと思います。</p>
 
@@ -817,18 +817,18 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 <p>コンテンツもViewModelも何もない空のMainWindowのみの状態です。</p>
 
-<p><img src="images/wpf-01-16.png" alt="wpf-01-16" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-16.png" alt="wpf-01-16" /></p>
 
 <p>ここにViewを追加します。</p>
 
-<p><img src="images/wpf-01-17.png" alt="wpf-01-17" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-17.png" alt="wpf-01-17" /></p>
 
 <p>名前はMainViewで、WPFのユーザーコントロールで追加します。<br/>
 VisualStudioにはItemTemplatesフォルダがあって、これを利用すると便利なのですが、それは次回に紹介します。</p>
 
 <p>MainViewクラスのベースクラスをBizViewに変更します。</p>
 
-<p><img src="images/wpf-01-18.png" alt="wpf-01-18" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-18.png" alt="wpf-01-18" /></p>
 
 <p>この作業に今は手間がかかりますが、ItemTemplateを紹介するまでの我慢です。</p>
 
@@ -837,11 +837,11 @@ VisualStudioにはItemTemplatesフォルダがあって、これを利用する�
 
 <p>このViewに先ほどと同じようにテキストボックスを配置します。</p>
 
-<p><img src="images/wpf-01-19.png" alt="wpf-01-19" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-19.png" alt="wpf-01-19" /></p>
 
 <p>次にMainViewModelを追加します。</p>
 
-<p><img src="images/wpf-01-20.png" alt="wpf-01-20" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-20.png" alt="wpf-01-20" /></p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -903,7 +903,7 @@ VisualStudioにはItemTemplatesフォルダがあって、これを利用する�
 
 <p>今は空のMainWindowとMainView/MainViewModelがある状態です。</p>
 
-<p><img src="images/wpf-01-21.png" alt="wpf-01-21" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-21.png" alt="wpf-01-21" /></p>
 
 <p>最後にMainWindowにコンテンツとセレクターを設定します。</p>
 
@@ -936,7 +936,7 @@ VisualStudioにはItemTemplatesフォルダがあって、これを利用する�
 <p>以上で準備が完了です。<br/>
 デバック実行すると・・・</p>
 
-<p><img src="images/wpf-01-22.png" alt="wpf-01-22" /></p>
+<p><img src="http://s-ueno.github.io/images/wpf-01-22.png" alt="wpf-01-22" /></p>
 
 <p>期待した結果が表示されました！</p>
 
@@ -954,7 +954,7 @@ VisualStudioにはItemTemplatesフォルダがあって、これを利用する�
 
 <p>次回は今までの作業で手間だったものの自動化を考えてItemTemplateの紹介と、もう少し踏み込んでボタンを押して動くところまでもっていければと思います。</p>
 
-<p>今回のサンプルは<a href="images/uEN-Vol01.zip">コチラ</a></p>
+<p>今回のサンプルは<a href="http://s-ueno.github.io/images/uEN-Vol01.zip">コチラ</a></p>
 
 <hr />
 </div>
