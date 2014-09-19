@@ -30,6 +30,12 @@
 <link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 <link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
 
+<script language="JavaScript">
+$(document).ready( function () {
+   $("a[href^='http']:not([href*='" + location.hostname + "'])").attr('target', '_blank');
+})
+</script>
+
 
   
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -42,6 +48,7 @@
     })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'UA-54883059-1', 'auto');
+    ga('require', 'displayfeatures');
     ga('send', 'pageview');
 
   </script>
@@ -500,7 +507,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 <h2>LOB開発基盤　-　View</h2>
 
-<p>次にViewについて少し掘り下げいきます。
+<p>次にViewについて少し掘り下げていきます。
 今はWindowのXamlに直接記述しています。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -547,7 +554,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 
 <p>なので、コンテンツは一つのみとなります。
-ただしWPFの拡張機能によって、このコンテンツがどのように描画されるかは変わってきます。</p>
+ただし、このコンテンツがどのように描画されるかはWPFの拡張機能によって変わってきます。</p>
 
 <p>試しにデバック実行し、WPFビジュアライザーで確認してみると</p>
 
@@ -966,7 +973,7 @@ VisualStudioにはItemTemplatesフォルダがあって、これを利用する�
 
 <p>思いつくままをオレオレ実装してもいいですし、<a href="http://www.microsoft.com/ja-jp/dev/2010/solutions/architecture/default.aspx">Application Architecture Guide</a>などを読み解いて、しかるべき処理を準備していくのも一つかもしれません。</p>
 
-<p>次回は今までの作業で手間だったものの自動化を考えてItemTemplateの紹介と、もう少し踏み込んでボタンを押して動くところまでもっていければと思います。</p>
+<p>次回は今までの作業で手間だったものの自動化を考えてItemTemplatesの紹介と、もう少し踏み込んでボタンを押して動くところまでもっていければと思います。</p>
 
 <p>今回のサンプルは<a href="http://s-ueno.github.io/images/uEN-Vol01.zip">コチラ</a></p>
 
@@ -1008,6 +1015,11 @@ VisualStudioにはItemTemplatesフォルダがあって、これを利用する�
         </p>
         
           <div class="sharing">
+  <!-- hatebu-start -->
+  
+  <a href="http://b.hatena.ne.jp/entry/http://s-ueno.github.io/blog/2014/09/11/wpf-01/" class="hatena-bookmark-button" data-hatena-bookmark-layout="standard" title="このエントリーをはてなブックマークに追加"><img src="http://b.st-hatena.com/images/entry-button/button-only.gif" alt="このエントリーをはてなブックマークに追加" width="20" height="20" style="border: none;" /></a><script type="text/javascript" src="http://b.st-hatena.com/js/bookmark_button.js" charset="utf-8" async="async"></script>
+  
+  <!-- hatebu-end -->
   
   <a href="//twitter.com/share" class="twitter-share-button" data-url="http://s-ueno.github.io/blog/2014/09/11/wpf-01/" data-via="" data-counturl="http://s-ueno.github.io/blog/2014/09/11/wpf-01/" >Tweet</a>
   

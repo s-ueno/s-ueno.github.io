@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-09-17T12:26:45+09:00</updated>
+  <updated>2014-09-19T11:42:00+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -382,7 +382,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 <h2>LOB開発基盤　-　View</h2>
 
-<p>次にViewについて少し掘り下げいきます。
+<p>次にViewについて少し掘り下げていきます。
 今はWindowのXamlに直接記述しています。</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -429,7 +429,7 @@ LINQが利用されるようになってきて、このラムダにおける型�
 
 
 <p>なので、コンテンツは一つのみとなります。
-ただしWPFの拡張機能によって、このコンテンツがどのように描画されるかは変わってきます。</p>
+ただし、このコンテンツがどのように描画されるかはWPFの拡張機能によって変わってきます。</p>
 
 <p>試しにデバック実行し、WPFビジュアライザーで確認してみると</p>
 
@@ -848,7 +848,7 @@ VisualStudioにはItemTemplatesフォルダがあって、これを利用する�
 
 <p>思いつくままをオレオレ実装してもいいですし、<a href="http://www.microsoft.com/ja-jp/dev/2010/solutions/architecture/default.aspx">Application Architecture Guide</a>などを読み解いて、しかるべき処理を準備していくのも一つかもしれません。</p>
 
-<p>次回は今までの作業で手間だったものの自動化を考えてItemTemplateの紹介と、もう少し踏み込んでボタンを押して動くところまでもっていければと思います。</p>
+<p>次回は今までの作業で手間だったものの自動化を考えてItemTemplatesの紹介と、もう少し踏み込んでボタンを押して動くところまでもっていければと思います。</p>
 
 <p>今回のサンプルは<a href="http://s-ueno.github.io/images/uEN-Vol01.zip">コチラ</a></p>
 
