@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Wpf | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-10-01T13:57:58+09:00</updated>
+  <updated>2014-10-01T14:04:16+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 02 - ルーティング イベント]]></title>
-    <link href="http://s-ueno.github.io/blog/2014/09/12/wpf-02/"/>
-    <updated>2014-09-12T16:57:00+09:00</updated>
-    <id>http://s-ueno.github.io/blog/2014/09/12/wpf-02</id>
+    <link href="http://s-ueno.github.io/blog/2014/10/01/wpf-02/"/>
+    <updated>2014-10-01T14:00:00+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/10/01/wpf-02</id>
     <content type="html"><![CDATA[<p>最初に簡単に<a href="http://msdn.microsoft.com/ja-jp/library/ms247121.aspx">ItemTemplates</a>について紹介して、<a href="http://msdn.microsoft.com/ja-jp/library/ms742806.aspx">ルーティング イベント</a>とビューモデルの紐付おまじないコードの解決を図りたいと思います。</p>
 
 <!-- more -->
