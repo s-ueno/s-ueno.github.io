@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Wpf | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-09-19T11:42:00+09:00</updated>
+  <updated>2014-10-01T13:57:58+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -14,7 +14,149 @@
 
   
   <entry>
-    <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 01]]></title>
+    <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 02 - ルーティング イベント]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/09/12/wpf-02/"/>
+    <updated>2014-09-12T16:57:00+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/09/12/wpf-02</id>
+    <content type="html"><![CDATA[<p>最初に簡単に<a href="http://msdn.microsoft.com/ja-jp/library/ms247121.aspx">ItemTemplates</a>について紹介して、<a href="http://msdn.microsoft.com/ja-jp/library/ms742806.aspx">ルーティング イベント</a>とビューモデルの紐付おまじないコードの解決を図りたいと思います。</p>
+
+<!-- more -->
+
+
+<p>たとえばVisualStudio2013をインストールすると、
+C:\Users\&ldquo;username&rdquo;\Documents\Visual Studio 2013\Templates\
+というフォルダができていると思います。</p>
+
+<p>ここに以下の作業を実施します。</p>
+
+<ul>
+<li>【ItemTemplates】フォルダ - 【Visual C#】フォルダの中に新規フォルダ作成（uEN Laboratory）</li>
+<li>この<a href="http://s-ueno.github.io/additionalData/BizViewModel.zip">ZIPファイル</a>を先ほどのフォルダに入れる</li>
+</ul>
+
+
+<p>そうすると、クラスの新規追加時に雛形を提供することができます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-02-01.png" alt="wpf-02-01" /></p>
+
+<p>ViewクラスとVeiwModelクラスがセットで追加されます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-02-02.png" alt="wpf-02-02" /></p>
+
+<p>名前空間などはテンプレートがサポートします。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-02-03.png" alt="wpf-02-03" />
+<img src="http://s-ueno.github.io/images/wpf-02-04.png" alt="wpf-02-04" /></p>
+
+<p>前回はベースクラス名を変えたり、Xamlに名前空間をインポートしたりとかなり手間だったのですが、この機能を利用すると毎回同じ作業を実施しなくて済むようになります。
+WPFでの開発生産性を上げる上ではとても有効なので、ぜひ利用してみてください。</p>
+
+<p>カスタマイズするには、さっきのZIPファイルやMSDNを参考にすると簡単にできるのでチェックしてみてください。</p>
+
+<h2>ルーティング イベント</h2>
+
+<p>ボタン押下などのイベント処理を簡単に実装するためには、またおまじないコードが必要になります。<br/>
+<a href="http://ja.wikipedia.org/wiki/Model_View_ViewModel">Model-View-ViewModel</a> デザイン パターンを利用しない場合は、Xaml（ザムル）上でダブルクリックすると、Xaml.CSファイルのコードビハインドにクリックイベントが紐付けられます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-02-05.png" alt="wpf-02-05" />
+<img src="http://s-ueno.github.io/images/wpf-02-06.png" alt="wpf-02-06" /></p>
+
+<p>ただ、これでは画面をXamlで作成するという難易度だけ上がって、Windows Formとあまり変わりません。
+そこで、このイベント処理もバインディングできればと思います。</p>
+
+<p>上記の実装ですが、明示的にRoutedEventを利用してコードビハインド上で記述することもできます。</p>
+
+<pre><code>    SampleButton.AddHandler(Button.ClickEvent, new RoutedEventHandler(SampleButton_Click));
+</code></pre>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.buttonbase.clickevent.aspx">Button.ClickEvent</a> は　Buttonクラスに静的に定義され、開発者が利用できるように提供されています。</p>
+
+<p>この仕組みを利用することで、指定したオブジェクトが指定したRoutedEventを実行する際の処理をどこか別の場所（具体的にはViewModel）に定義することができるようになります。</p>
+
+<p><a href="http://ja.wikipedia.org/wiki/Proxy_%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Proxyパターン</a>を利用したラッパー経由でViewModelのメソッドに割り付けるようなクラスを準備すれば十分ではないでしょうか。
+前回、バインドをタイプセーフに行うためにラムダ式でプロパティ名を指定したように、このイベントの紐付けもラムダ式で行うようにしたいと思います。</p>
+
+<pre><code>    public class RoutedEventBehavior
+    {
+        public RoutedEvent RoutedEvent { get; set; }
+        public object ViewModel { get; set; }
+        public DependencyObject Element { get; set; }
+        public LambdaExpression LambdaExpression { get; set; }
+        protected Action Method { get; set; }
+        protected Action&lt;RoutedEventArgs&gt; ArgsMethod { get; set; }
+        public virtual void Ensure()
+        {
+            var uiElement = Element as UIElement;
+            if (uiElement == null)
+                return;
+
+            if (Method == null &amp;&amp; ArgsMethod == null)
+            {
+                var compile = LambdaExpression.Compile().DynamicInvoke(ViewModel);
+                Method = compile as Action;
+                ArgsMethod = compile as Action&lt;RoutedEventArgs&gt;;
+            }
+            uiElement.AddHandler(RoutedEvent, new RoutedEventHandler(OnEventInternal));
+        }
+        protected virtual void OnEventInternal(object sender, RoutedEventArgs e)
+        {
+            var currentCursor = Mouse.OverrideCursor;
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
+            try
+            {
+                if (Method != null)
+                    Method.Invoke();
+
+                if (ArgsMethod != null)
+                    ArgsMethod.Invoke(e);
+            }
+            catch (Exception)
+            {
+                //エラー時のアプリケーション ポリシー
+                throw;
+            }
+            finally
+            {
+                Mouse.OverrideCursor = currentCursor;
+            }
+        }
+    }
+</code></pre>
+
+<p>サンプル程度の実装ですが、こうすることで、ボタン押下時のマウスカーソルの自動Wait化やエラー時のロギングなどを開発者が実装する必要がなくなります。
+ログ出力には、<a href="http://msdn.microsoft.com/ja-jp/library/System.Diagnostics.TraceSource.aspx">TraceSource</a>クラスを利用すると便利なので、別の機会に紹介します。</p>
+
+<p>また、開発者が直接このようなクラスを生成する手間は省きたいです。<br/>
+たとえば<a href="https://www.google.com/search?q=Expression+Builder%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Expression Builderパターン</a>なんてプログラミング デザイン パターンを採用してみれば、開発がしやすく可読性があがるかもしれません。</p>
+
+<p>画面上にテキストボックス、ボタンが配置されている場合のコーディング イメージとしてはこのような形でしょうか？</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-02-07.png" alt="wpf-02-07" /></p>
+
+<p>コントロールを指定して、依存関係プロパティないしルーティング イベントとViewModelのメソッドをタイプセーフに紐付けるビルダーを利用してバインドするという形です。</p>
+
+<p>このコードを記述して実際に動かすとこのようになります。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-02-08.png" alt="wpf-02-08" /></p>
+
+<p>テキストボックスに文字を入力し、ボタンをクリックするとViewModel上のSampleActionメソッドが呼び出され、バインドしているSampleTextプロパティから文字を取得してメッセージ表示しています。</p>
+
+<p>ツールレベルならコレでも十分かもしれませんが、実際のLOB開発時には画面に表示する際に変換（<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.ivalueconverter.aspx">IValueConverter</a>）する、入力制限する、他にも様々な作業が発生するので、次回は少しこのバインディングについて掘り下げていきたいと思います。</p>
+
+<p>余談ですが、Buttonクラスは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.buttonbase.command.aspx">Command</a>というプロパティを提供しています。<br/>
+こちらを利用することでもボタンのクリックイベント処理を実装することができるのですが、この仕組みはLOBアプリのとあるボタンの押下処理とは意味合いが少し異なることを<a href="http://msdn.microsoft.com/ja-jp/library/ms752308.aspx">目的</a>にしています。</p>
+
+<p>LOBアプリでのイベント処理はルーティング イベントを利用するほうがシンプルです。
+コマンドについては別の機会で紹介できればと思います。</p>
+
+<p>今回のサンプルは<a href="http://s-ueno.github.io/additionalData/uEN-Vol02.zip">コチラ</a></p>
+
+<hr />
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 01 - WPFプロパティ システム]]></title>
     <link href="http://s-ueno.github.io/blog/2014/09/11/wpf-01/"/>
     <updated>2014-09-11T12:03:19+09:00</updated>
     <id>http://s-ueno.github.io/blog/2014/09/11/wpf-01</id>
