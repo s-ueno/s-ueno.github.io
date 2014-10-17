@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Wpf | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-10-01T14:04:16+09:00</updated>
+  <updated>2014-10-17T18:02:27+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,383 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 03 - バインディング]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/10/08/wpf-03/"/>
+    <updated>2014-10-08T12:00:00+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/10/08/wpf-03</id>
+    <content type="html"><![CDATA[<p>これまでは必要最低限の予備学習でしたが、本質に切り込んで <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.aspx">バインディング</a> について紹介します。<br/>
+WPFの肝要は バインディングとテンプレートだと言えるくらい重要です。</p>
+
+<p>今回はDateTimeを表示するだけの簡単なサンプルですが、WPF プロパティ システム の仕組みを覗いてみたいと思います。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-07.png" alt="wpf-03-07" /></p>
+
+<!-- more -->
+
+
+<p>前回までと同じですが、今度はViewModelのプロパティがDateTime型となっており、バインディング時に一つだけ表示書式が適用されています。</p>
+
+<h2>ViewModel</h2>
+
+<pre><code>    [VisualElements(typeof(BizViewModelName1View))]
+    public class BizViewModelName1ViewModel : BizViewModel
+    {
+        public DateTime? SampleDate
+        {
+            get { return _sampleDate; }
+            set
+            {
+                SetProperty(ref _sampleDate, value);
+            }
+        }
+        private DateTime? _sampleDate = DateTime.Now;
+
+        public void SampleAction()
+        {
+            MessageBox.Show(SampleDate.GetValueOrDefault().ToString("yyyy年MM月dd日"));
+        }
+    }
+</code></pre>
+
+<h2>Xaml</h2>
+
+<pre><code>&lt;TextBox Name="SampleTextBox" Text="{Binding Path=SampleDate, StringFormat=yyyy年MM月dd日}"/&gt;
+</code></pre>
+
+<p>TextBox.Text プロパティにBindingクラスの指定と、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.path.aspx">Path</a> プロパティおよび<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.bindingbase.stringformat.aspx">StringFormat</a> プロパティを指定しています。
+C#で記述するとしてもほぼ同じことを記述します。</p>
+
+<pre><code>BindingOperations.SetBinding(SampleTextBox, TextBox.TextProperty, new Binding("SampleDate") { StringFormat = "yyyy年MM月dd日" });
+</code></pre>
+
+<p>WPF プロパティ システムを理解するということは、このBindingクラスの利用方法に他なりません。
+どういうことか動かしながら確認したいと思います。</p>
+
+<p>今まで通り、ボタンを押下するとViewModelのプロパティから値を取得してメッセージボックスを表示するアプリケーションです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-08.png" alt="wpf-03-08" /></p>
+
+<p>テキストボックスにキー入力で日付を変えボタンを押下すると、それがViewModelに自動で反映されている状態です。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-09.png" alt="wpf-03-09" /></p>
+
+<p>現在、Binding クラスにはStringFormat以外何も指定していないにもかかわらず、いくつかの規定の動作が注入されています。<br/>
+Binding クラスの機能を全て紹介するのは大変ですが、上記を通じて基本的なものを紹介します。</p>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.mode.aspx">Mode</a> プロパティ</li>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.updatesourcetrigger.aspx">UpdateSourceTrigger</a> プロパティ</li>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.validationrules.aspx">ValidationRules</a> プロパティ</li>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.converter.aspx">Converter</a> プロパティ</li>
+</ul>
+
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.mode.aspx">Mode</a> /  <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.updatesourcetrigger.aspx">UpdateSourceTrigger</a></h2>
+
+<p>まず、現在の動作を確認するとTextBox.Text プロパティにキーボード入力で値を設定し、
+ボタンを押下した（テキストボックスからフォーカスが外れた）タイミングでViewModelに画面上のデータが送信されています。</p>
+
+<p>これは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.mode.aspx">Mode</a> プロパティと<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.updatesourcetrigger.aspx">UpdateSourceTrigger</a> プロパティが関係しています。</p>
+
+<p>TextBox.Text プロパティにバインディングした場合ですが、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.mode.aspx">Mode</a> のデフォルト値は BindingMode.TwoWay となっています。<br/>
+テキストボックスなのでキーボード入力が前提で、ViewModelのデータも表示する必要があるため、お互いにデータを双方向でやり取りするモードとなっています。</p>
+
+<p>これがラベルのようにキーボード入力がない場合は、デフォルトのモードは OneWay となります。
+多くの提供されているWPFコンテンツは Default で適切ですが、これを変更することができるのが<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.mode.aspx">Mode</a> プロパティです。</p>
+
+<p>先ほどの画面で<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.mode.aspx">Mode</a> プロパティに OneWay と設定した場合、以下のようにViewModelにはデータが反映されなくなります。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-10.png" alt="wpf-03-10" /></p>
+
+<p>次に、ロストフォーカスでView上のデータがViewModelに自動転送されている設定ですが、MSDNに記述があります。</p>
+
+<blockquote><p>TextBox.Text プロパティの UpdateSourceTrigger の既定値は LostFocus です。</p></blockquote>
+
+<p>WPF プロパティ システム はこれらの設定が既定で適用されている結果、開発者が深く意識しなくても動くアプリケーションが構築できるようになっています。</p>
+
+<p>テキストボックスがロストフォーカス時にViewModelに値を転送するのには理由があります。</p>
+
+<p>TextBox.Text プロパティはキー入力およびIMEでの候補を選択中でも値が変わります。
+仮に UpdateSourceTrigger を PropertyChanged に、つまりText プロパティが変わる（≒キータイピング）のたびに
+ViewModelへとデータ送信するようになると、想像通りアプリケーションは機能しなくなります。</p>
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.validationrules.aspx">ValidationRules</a></h2>
+
+<p>ところで、ViewModel上はDateTime型で値を保持しているので、先ほどのテキストボックスで日付に変換できないような値を入力した場合、どうなるでしょう？
+試してみます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-11.png" alt="wpf-03-11" /></p>
+
+<p>ボタンを押下するためにフォーカスを外れると&hellip;</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-12.png" alt="wpf-03-12" /></p>
+
+<p>テキストボックスが赤枠表示され、デバックログにはエラーがあった旨が出力されています。</p>
+
+<pre><code>System.Windows.Data Error: 7 : ConvertBack cannot convert value '2014年10月99日' (type 'String'). BindingExpression:Path=SampleDate; DataItem='BizViewModelName1ViewModel' (HashCode=21817343); target element is 'TextBox' (Name='SampleTextBox'); target property is 'Text' (type 'String') FormatException:'System.FormatException: 文字列で表される DateTime がカレンダー System.Globalization.GregorianCalendar でサポートされていません。
+   場所 System.DateTime.Parse(String s, IFormatProvider provider)
+   場所 System.Convert.ToDateTime(String value, IFormatProvider provider)
+   場所 System.Convert.ChangeType(Object value, Type conversionType, IFormatProvider provider)
+   場所 System.Windows.Data.BindingExpression.ConvertBackHelper(IValueConverter converter, Object value, Type sourceType, Object parameter, CultureInfo culture)'
+</code></pre>
+
+<p>これは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.validationrules.aspx">ValidationRules</a> プロパティに深く関係する、入力値の妥当性検証が規定で実行された結果になります。</p>
+
+<p>この機能は奥深く、大きく三つのことを検討しなければなりません。</p>
+
+<ul>
+<li>検証ルールの定義</li>
+<li>検証結果の視覚的フィードバック</li>
+<li>検証を実行するタイミング</li>
+</ul>
+
+
+<p>これについてもMSDNに丁寧な記載があります。</p>
+
+<blockquote><p>カスタム ErrorTemplate を提供しない場合、検証エラーがあった際にユーザーに視覚的にフィードバックするために、既定のエラー テンプレートが使用されることに注意してください。 詳細については、「データ バインドの概要」の「データの検証」を参照してください。 さらに WPF は、バインド ソース プロパティの更新中にスローされる例外をキャッチするための、組み込みの検証規則を提供します。 詳細については、「ExceptionValidationRule」を参照してください。</p></blockquote>
+
+<p>先ほど学習したように、TextBox.Text プロパティの規定の<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.mode.aspx">Mode</a> プロパティは TwoWay つまり双方向通信します。<br/>
+さらにそのタイミングを決定する<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.updatesourcetrigger.aspx">UpdateSourceTrigger</a> プロパティは LostFocus のため、フォーカスが外れるタイミングでバインド ソース プロパティ、つまりViewModelのプロパティを更新します。
+ただし、2014年10月99日はDateTime型に変換できずエラーが発生した結果、組み込みの検証規則ExceptionValidationRuleが実行、赤枠の規定エラーテンプレートが適用されました。</p>
+
+<ul>
+<li>検証ルール
+
+<ul>
+<li>バインド ソース プロパティの更新中にスローされる例外をキャッチするための、組み込みの検証規則</li>
+</ul>
+</li>
+<li>結果の外観
+
+<ul>
+<li>検証エラーがあった際にユーザーに視覚的にフィードバックするために、既定のエラー テンプレート</li>
+</ul>
+</li>
+<li>検証を実行するタイミング
+
+<ul>
+<li>バインド ソース プロパティの更新（ViewのデータをViewModelへ送信しようとするタイミング）</li>
+</ul>
+</li>
+</ul>
+
+
+<p>これらが全て規定動作で動いた結果、現在の状態になっています。</p>
+
+<p>では、Lob開発をするにあたっては、様々な入力検証（たとえば必須入力や型桁検証）を実行したい状況もあれば、その検証を適用するタイミングもロストフォーカスではなく、任意のタイミングで実行したいなどの要件も発生します。</p>
+
+<p>これらの要件についても、今まで得たバインディングの知識を組み合わせることで、柔軟に対応できます。</p>
+
+<p>UpdateSourceTrigger.Explicit という設定があります。
+現在はロストフォーカス時にデータをViewModelへ転送する設定ですが、Explicit では開発者が明示的にデータ転送用のメソッドを呼び出すタイミングでそれが行われます。</p>
+
+<p>では、さっそくコーディングしましょう！</p>
+
+<pre><code>&lt;TextBox Text="{Binding Path=SampleDate, UpdateSourceTrigger=Explicit, StringFormat=yyyy年MM月dd日}" /&gt;
+</code></pre>
+
+<p>これだけで、ロストフォーカスでValidationRuleが適用されることはなくなりました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-13.png" alt="wpf-03-13" /></p>
+
+<p>基本ですが、バインディングの肝要です。</p>
+
+<p>ルールを新しく追加することなどもっと簡単で、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.validationrule.aspx">ValidationRule</a> クラスを派生して値を検証するロジックを記述し、それを利用する開発者に提供するだけです。</p>
+
+<p>では、必須入力ルールを作成してみましょう。</p>
+
+<pre><code>    public class RequiredRule : ValidationRule
+    {
+        public object ErrorContent
+        {
+            get { return errorContent; }
+            set { errorContent = value; }
+        }
+        private object errorContent = "Required fields.";
+
+        public override ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
+        {
+            if (value == null)
+                return new ValidationResult(false, ErrorContent);
+            if (value is string &amp;&amp; string.IsNullOrEmpty(value as string))
+                return new ValidationResult(false, ErrorContent);
+            return new ValidationResult(true, null);
+        }
+    }
+</code></pre>
+
+<p>これを Binding.ValidationRules プロパティに Add する作業が必要ですが、それはどうとでもなります。<br/>
+気にするとすれば、開発者が簡単かつ柔軟にValidationRule プロパティを拡張して適用できるように気を使うことです。</p>
+
+<p>余談ですが、こういうライブラリを設計するアプローチもいろいろあり、楽しいものです。</p>
+
+<p>『桁や必須かどうかというものは、データの属性である』というアプローチであったり、これを利用する開発イメージを処理と捉えてそこからスタートする方法もあります。</p>
+
+<p>設計するアプローチは様々あり、それを選択していることを受け入れるいうことは重要です。<br/>
+与太話でしたが、まとめるとこんなイメージで！</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-14.png" alt="wpf-03-14" /></p>
+
+<p>開発者は、バインドしているデータの書式および必須ルールを属性として利用できるようなイメージです。
+このライブラリを開発する際に気にすることがあるとすれば、ルールは開発者が容易に拡張できるようなソリューションだと思います。</p>
+
+<p>ところで、上述の RequiredRule ではデータ単体に着目したのですが、相関的な検証ルールはどうでしょうか。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.validationrule.aspx">ValidationRule</a> クラスをMSDNで確認すると、すでにいくつかの派生クラスが規定で用意されています。</p>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.exceptionvalidationrule.aspx">ExceptionValidationRule</a> クラス
+
+<ul>
+<li>既定で適用されていることを確認しました。</li>
+</ul>
+</li>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.dataerrorvalidationrule.aspx">DataErrorValidationRule</a> クラス</li>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.notifydataerrorvalidationrule.aspx">NotifyDataErrorValidationRule</a> クラス</li>
+</ul>
+
+
+<p>これらは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.validationrules.aspx">ValidationRules</a> プロパティに追加せずとも、自動で有効になるようなオプションが Binding クラスに用意されています。</p>
+
+<pre><code>&lt;TextBox Text="{Binding Path=SampleDate, ValidatesOnDataErrors=True}"/&gt;
+&lt;TextBox Text="{Binding Path=SampleDate, ValidatesOnExceptions=True}"/&gt;
+&lt;TextBox Text="{Binding Path=SampleDate, ValidatesOnNotifyDataErrors=True}"/&gt;
+</code></pre>
+
+<p>多くは規定で適用されており、これらを明示的に意識する必要はありません。</p>
+
+<p>また、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.notifydataerrorvalidationrule.aspx">NotifyDataErrorValidationRule</a> クラスは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.dataerrorvalidationrule.aspx">DataErrorValidationRule</a> クラスの上位機能になります。<br/>
+（NotifyDataErrorValidationRule は .Net Framework4.5 で提供されました。）</p>
+
+<p>話を戻すと、この用意されているルールを利用して相関的な検証ロジックを実装する方法について紹介します。</p>
+
+<p>この機能はView（ターゲット）からViewModel（データソース）へと値を転送した後にその値を保持するクラスが
+<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.inotifydataerrorinfo.aspx">INotifyDataErrorInfo</a> インターフェイスを実装していれば、自動で有効になる機能です。</p>
+
+<p>今のサンプルを例にしてみると、 ViewModel の SampleDate プロパティを TextBox.Text プロパティにバインドしています。
+TextBoxに値を入力しそれが例外なくSampleDateに転送できた場合に、ViewModelが<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.inotifydataerrorinfo.aspx">INotifyDataErrorInfo</a> インターフェイスを実装していれば、自動で検証メソッドが実行されます。</p>
+
+<p>この仕組みによって ViewModel上で、複数のプロパティを比較しながら、データの妥当性検証が可能になります。<br/>
+これはビジネス エンティティのカプセル化を支援します。</p>
+
+<p>どういうことかといえば、ある業務機能を実装するクラスがあったとします。<br/>
+それは Entity Framework を利用したPOCOクラスかもしれないし、型付きDataSetかもしれないし、もしくは業務専用クラスかもしれません。</p>
+
+<p>それらの属性をバインドしているならば、そのクラスが<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.inotifydataerrorinfo.aspx">INotifyDataErrorInfo</a> インターフェイスを実装することで、そのクラスに閉じた形で検証処理を実装することができます。
+このインターフェイスは標準で参照している .Net Framework の System.dll が提供するので、WPFなどのプレゼンテーション テクノロジーとは切り離されています。</p>
+
+<p>MSが提供する <a href="http://www.microsoft.com/ja-jp/dev/2010/solutions/architecture/default.aspx">Application Architecture Guide 2.0</a> では一般的な開発レイヤとして以下の図で説明しています。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-03-15.png" alt="wpf-03-15" /></p>
+
+<p>ビジネスレイヤーでビジネスエンティティに検証ロジックをカプセル化し、それが自動でプレゼンテーション レイヤで有効化できるようなソリューションです。</p>
+
+<p>ここまでで、単項目の検証ルールおよび複数項目の検証ルールが定義できるようになりました。</p>
+
+<ul>
+<li>検証ルールの定義</li>
+<li>検証結果の視覚的フィードバック</li>
+<li>検証を実行するタイミング</li>
+</ul>
+
+
+<p>あとは『検証結果の視覚的フィードバック』ですが、これはWPFテクノロジーのもう一つの肝要であるテンプレートを紹介する際にしたいと思います。
+今は既定の視覚的フィードバックをそのまま利用しましょう。</p>
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.converter.aspx">Converter</a></h2>
+
+<p>さて、最後に<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.converter.aspx">Converter</a> プロパティについて紹介します。</p>
+
+<p>これは StringFormat プロパティと比べ、よりリッチな変換を適用できます。</p>
+
+<p>例えば、ViewModel上のプロパティ値が列挙体(None,Error,Complete)だった場合に、その列挙体にあったイメージ画像を返すみたいなグル（接着剤）コードをConverterクラスにカプセル化できます。</p>
+
+<p>MSDNのサンプルコードでは</p>
+
+<pre><code>    [ValueConversion(typeof(DateTime), typeof(String))]
+    public class DateConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+</code></pre>
+
+<p>という風にIValueConverterインターフェイスの実装と合わせて、ValueConversion属性も付与しています。<br/>
+これは自分が作業する分だけなのであれば特に不要なのですが、共通ライブラリなどを作成した際に、それを利用する開発者に対してのメッセージになります。</p>
+
+<p>WPFは自由度が高い反面、ルールがないと意図しない結果になる可能性があります。
+たとえばですが、開発者はXaml上でコンボボックスを正しくコーディングしていたとしても、テンプレートというスタイルを書き換える機能が適用された場合は、それがラジオボタンに差し替わって表示されることなど容易に可能です。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.validationrules.aspx">MSDNのこの記事</a>など読むと面白いのですが</p>
+
+<blockquote><p>このベスト プラクティスは、組み込みの WPF コントロール セット用のテーマ コントロール スタイルでの作業の際に、多くの試行錯誤を通じて得られたものです。</p></blockquote>
+
+<p>マイクロソフト内部でもいろいろと苦労したことが伺えます。</p>
+
+<p>例として<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.combobox.aspx">ComboBox</a>クラスを見ると様々な属性を持っていますが、この情報は後に柔軟なスタイルおよびデザイン（機能性）を実現する上でとても重要なものとなります。</p>
+
+<pre><code>[Localizability(LocalizationCategory.ComboBox)]
+[TemplatePart(Name = "PART_EditableTextBox", Type = typeof(TextBox))]
+[TemplatePart(Name = "PART_Popup", Type = typeof(Popup))]
+[StyleTypedProperty(Property = "ItemContainerStyle", StyleTargetType = typeof(ComboBoxItem))]
+public class ComboBox : Selector
+
+/*
+今はWPFの基本を解決している最中でが、応用してテンプレートを利用する世界では、
+技術資産を蓄積できるようになります。
+
+その際にはコンボボックスをカスタマイズしたスタイルの適用や、
+添付プロパティによるカスタマイズなどを紹介したいと思います。
+*/
+</code></pre>
+
+<p>ライブラリとしてIValueConverterを提供する場合は、開発者へのメッセージとしてValueConversion属性をつけてね、ということなのですが・・・</p>
+
+<p>確かに、Xaml上でIValueConverterを適用するためには日付用とか●×用とか何個も専用のクラスを作成する必要があります。</p>
+
+<pre><code>        &lt;StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Margin="5" &gt;
+            &lt;StackPanel.Resources&gt;
+                &lt;local:DateConverter x:Key="dateConverter"/&gt;
+            &lt;/StackPanel.Resources&gt;
+            &lt;TextBox Name="ConverterTextBox" Text="{Binding Path=SampleDate, Converter={StaticResource dateConverter}, ConverterParameter=arg}"/&gt;
+        &lt;/StackPanel&gt;
+</code></pre>
+
+<p>ただ、<a href="https://www.google.com/search?q=Expression+Builder%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Expression Builder</a>パターンでコードビハインド上でのコーディングを採用するとしたら、以下で多くは解決できます。</p>
+
+<pre><code>
+    public class SimpleConverter : IValueConverter
+    {
+        public Func&lt;object, Type, object, CultureInfo, object&gt; ConvertMethod { get; set; }
+        public Func&lt;object, Type, object, CultureInfo, object&gt; ConvertBackMethod { get; set; }
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (ConvertMethod != null)
+                return ConvertMethod(value, targetType, parameter, culture);
+            throw new NotImplementedException();
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (ConvertBackMethod != null)
+                return ConvertBackMethod(value, targetType, parameter, culture);
+            throw new NotImplementedException();
+        }
+    }
+</code></pre>
+
+<p>WPFテクノロジー依存であり、Viewのコードビハインド上に静的メソッドを用意すればかなりシンプルになります。</p>
+
+<p>IValueConverter としてはシステムで共通的なロジックの部品化という視点で拡張すればと思います。
+ただ、多くはアドホックで業務（≒画面）固有なので、上記のようなメソッド指定が活躍することは多いです。</p>
+
+<p>以上で、バインディングの基本でありながら、WPFの肝要となる機能の紹介でした。</p>
+
+<p>これらの動作を確認するためのサンプルは<a href="http://s-ueno.github.io/additionalData/uEN-Vol03.zip">コチラ</a></p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 02 - ルーティング イベント]]></title>
