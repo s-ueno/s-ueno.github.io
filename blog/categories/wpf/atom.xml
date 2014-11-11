@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Wpf | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-11T01:10:31+09:00</updated>
+  <updated>2014-11-11T23:58:10+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,236 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Buttonに学ぶテンプレートとスタイル - WPF Vol 05]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/11/wpf-06/"/>
+    <updated>2014-11-11T23:58:00+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/11/wpf-06</id>
+    <content type="html"><![CDATA[<p>Buttonの外観を通じて、テンプレートおよびスタイルについて紹介します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-01.png" alt="wpf-06-01" /></p>
+
+<!-- more -->
+
+
+<h2>Windows 7 スタイル</h2>
+
+<p>WPFがこのお馴染みのスタイルを描画するためには、以下のような要件を適用しています。</p>
+
+<ul>
+<li>キーボードフォーカス(入力デバイスがキーボードがミソ。マウスじゃないよ)が入ると、ボタンの枠よりマージン2だけ小さい領域に指定した間隔の点線を描画</li>
+<li>論理フォーカスが入ると、ButtonChromeクラスがゴニョゴニョして、ボタンの後ろ側にあるコンテンツの色がアクセント色になる</li>
+<li>背景色は上から下に向かい、高さの半分からグラデーションで描画</li>
+<li>マウスがボタンの上にくるとボタンの色がアクセント色になる</li>
+<li>ボタンの上でマウスが押されている状態時に、ボタンの前景色を濃くする</li>
+<li>ボタンの文字は、内部的にContentPresenterに文字を設定しているので、自動でTextBlock化して表示されている</li>
+</ul>
+
+
+<p>などなどキリがありませんが、これらの要件をXAMLのスタイル上で以下のように表現しています。</p>
+
+<p>&#8220;`</p>
+
+
+
+<p><LinearGradientBrush x:Key="ButtonNormalBackground" EndPoint="0,1" StartPoint="0,0">
+    <GradientStop Color="#F3F3F3" Offset="0"/>
+    <GradientStop Color="#EBEBEB" Offset="0.5"/>
+    <GradientStop Color="#DDDDDD" Offset="0.5"/>
+    <GradientStop Color="#CDCDCD" Offset="1"/>
+</LinearGradientBrush>
+<SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/></p>
+
+
+
+<pre><code>
+このStyleですが、VisualStudio上で以下のように右クリックで簡単に取得できます。
+
+![wpf-06-02]
+
+
+XAML上に `&lt;Button Width="150" Height="50" Content="送信する" x:Name="SampleButton"/&gt;` と定義するだけで、内部的にはButton用スタイルが自動で適用されているわけです。
+ボタン自体のスタイルは `&lt;Style x:Key="AeroButtonStyle" TargetType="{x:Type Button}"&gt;` から始まります。
+
+
+ `x:Key="AeroButtonStyle"` とキー指定している場合は、XAML上で明示的にキーを設定しないと適用されません。
+
+
+キー指定せずに `&lt;Style TargetType="{x:Type Button}"&gt;` とStyle定義すると、全てのボタンのスタイルがこれから定義するStyleに自動で従うようになります。  
+また、 `&lt;Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}"&gt;` と、BasedOnを指定することで、元になる定義済みのスタイルを適用した上で任意のスタイルを上書きすることもできます。
+
+
+ `&lt;Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/&gt; `
+ですが、TargetTypeが Button で Property名が "FocusVisualStyle" つまり [Button.FocusVisualStyle] プロパティに対して、Value=で "ButtonFocusVisual" というキー名の値を設定していることを表します。
+
+
+このキー名に一致するものは、以下のようになっています・
+</code></pre>
+
+
+
+<pre><code>
+Margin="2" で StrokeThickness="1" StrokeDashArray="1 2"のRectangleを描画していますね。  
+確かにTabでキーボードフォーカスを入れると、ちょっと小さな枠に点線で四角が描画されていませんか？
+
+
+![wpf-06-03]
+
+
+WPFが標準で提供する組込みコントロールも、最小限の部品（LabelやTextBlock、Rectangle）を組み合わせて構成されていることがわかります。
+なので、これら最小限の部品に対しては、デフォルトでスタイルが適用されるようなことをやってはなりません。
+
+ `&lt;Style TargetType="{x:Type TextBlock}"&gt;` とかすると、TextBlockはいたるところで利用されているので画面がまともに描画されなくなります。
+
+といっても、テキストブロック用のStyleを用意したい場合には `&lt;Style x:Key="MyTextBlock" TargetType="{x:Type TextBlock}"&gt;` のようにキーを明示的に宣言して、他のコントロールに影響がでないようにします。
+
+
+次に `&lt;Setter Property="` とプロパティ値をカスタマイズしていきますが、この際にスタイルをダイナミックに適用することもできます。
+
+ `&lt;Setter Property="Background" Value="{DynamicResource MyBackgroundBrush}"/&gt; `
+
+[DynamicResource]ですが、これは要素が実際にテンプレートを必要とする（描画）段階で、キー名で検索して適用します。
+StaticResourceが定数としたら、DynamicResourceは書き換え可能な変数というところでしょうか。
+
+
+アプリケーションはそのブランドイメージに見合う色などがあります。
+このブログも今は白とブルーを基調としたイメージカラーになっています。
+このようなイメージカラーをたとえば、カラーピッカーなどを利用してアプリケーションの実行中にダイナミックに変更することが可能になります。
+
+
+テンプレート
+---
+
+
+Xamlを利用して、様々なStyleを作成していく中で、 `&lt;Setter Property="Template"&gt; ` については、特別な意味があります。
+[Button.Template] プロパティは、このボタンの外観に関する全てを新しく書き換えることを意味します。
+
+
+Windows7のAeroスタイル例を整理しながら説明します。
+</code></pre>
+
+<p><Setter Property="Template">
+    &lt;Setter.Value>
+        <ControlTemplate TargetType="{x:Type Button}">
+            &lt;Themes:ButtonChrome x:Name=&ldquo;Chrome&rdquo; BorderBrush=&ldquo;{TemplateBinding BorderBrush}&rdquo; Background=&ldquo;{TemplateBinding Background}&rdquo; RenderMouseOver=&ldquo;{TemplateBinding IsMouseOver}&rdquo; RenderPressed=&ldquo;{TemplateBinding IsPressed}&rdquo; RenderDefaulted=&ldquo;{TemplateBinding IsDefaulted}&rdquo; SnapsToDevicePixels=&ldquo;true&rdquo;>
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            &lt;/Themes:ButtonChrome>
+        </ControlTemplate>
+    &lt;/Setter.Value>
+</Setter>
+&#8220;`</p>
+
+<p><code>&lt;ControlTemplate TargetType="{x:Type Button}"&gt;</code> として、Buttonの外観を再定義しています。</p>
+
+<p>その中身は <code>&lt;Themes:ButtonChrome ・・・</code> として、<a href="http://msdn.microsoft.com/ja-jp/library/microsoft.windows.themes.buttonchrome.aspx">Microsoft.Windows.Themes.ButtonChrome</a> クラスを指定しています。
+仮にココにCheckBoxを指定した場合は、開発者はButtonをXamlに定義しているにもかかわらず、実行してみると画面上にはチェックボックスが表示されることになります。これがテンプレートです。</p>
+
+<p>各種プロパティに設定している<a href="http://msdn.microsoft.com/ja-jp/library/ms742882.aspx">TemplateBinding</a>は、別のコントロール プロパティ値を参照するバインディング機能になります。
+ここでは、ButtonChrome.BorderBrushは、ControlTemplateで定義されているButton(つまりもともとのコントロール)のBorderBrush値を参照するように設定されています。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms742882.aspx">TemplateBinding</a> はより具体的で柔軟な設定を可能とし、例えば2個上の親コンテンツのプロパティ値や、指定した親の型が見つかればその値を利用するなど、カスタム コントロールを作成するレベルでは、とても重宝するバインディング機能の一つです。</p>
+
+<p>WPFはバインディングとテンプレートが肝要と紹介する所以です。</p>
+
+<p><code>&lt;ContentPresenter ・・・</code> は Botton.Contentプロパティに設定した&#8221;送信する&#8221;という表示文字列が、ContentPresenterに設定された結果、前に説明した通りTextBlockとして画面に表示されることになります。</p>
+
+<p>WPFのデバック機能で、ビジュアライザーというものがあります。
+これを通して、外観を確認すると、なるほどとなります。</p>
+
+<p>サンプルボタン</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-04.png" alt="wpf-06-04" /></p>
+
+<p>そのテンプレートの最終的なContentPresenter</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-05.png" alt="wpf-06-05" /></p>
+
+<p>次に、先ほどは省略しましたが ControlTemplate に、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.controltemplate.triggers.aspx">ControlTemplate.Triggers</a> プロパティ値を設定していたと思います。</p>
+
+<pre><code>&lt;ControlTemplate.Triggers&gt;
+    &lt;Trigger Property="IsKeyboardFocused" Value="true"&gt;
+        &lt;Setter Property="RenderDefaulted" TargetName="Chrome" Value="true"/&gt;
+    &lt;/Trigger&gt;
+    &lt;Trigger Property="ToggleButton.IsChecked" Value="true"&gt;
+        &lt;Setter Property="RenderPressed" TargetName="Chrome" Value="true"/&gt;
+    &lt;/Trigger&gt;
+    &lt;Trigger Property="IsEnabled" Value="false"&gt;
+        &lt;Setter Property="Foreground" Value="#ADADAD"/&gt;
+    &lt;/Trigger&gt;
+&lt;/ControlTemplate.Triggers&gt;
+</code></pre>
+
+<p>これがXAMLが単なる<a href="http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E8%A8%98%E8%BF%B0%E8%A8%80%E8%AA%9E">データ記述言語</a>よりも優れていて、なんらかのイベント トリガーをキーに動的にプロパティ値を変更することができる技術になります。</p>
+
+<p>キーボードフォーカスを受け取ったときや、非活性時にはそれに見合ったスタイルを動的に適用することができます。</p>
+
+<p>こういった様々なXAML上の技術が適用されてWindows7のAeroスタイルが適用されていますが、ここで考えたいのが</p>
+
+<blockquote><p>“What is the difference between art and design?”（デザインとアートの違いとは何か？）</p>
+
+<p>”Design solves a problem, art is expression”（デザインとは問題解決であり、アートとは自己表現である。）</p>
+
+<p>Why?をBecauseで説明出来なければ、それは明らかにデザインではない</p></blockquote>
+
+<p>です。</p>
+
+<p>これを素で開発するとした場合は、開発者には高い技術力を求め、OSもこれを描画するための高いコストを支払います。
+果たして、これに対して Because を説明できるでしょうか？</p>
+
+<p>そうした結果が、Windows8 Styleや Flat Ftyleにつながりますが、果たしてまだ最適化はできないものでしょうか？</p>
+
+<h2>Windows8 Style</h2>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-06.png" alt="wpf-06-06" /></p>
+
+<p>Flat Styleはボタンを押下すると、ブランド カラー が表示されています。<br/>
+どちらも、無駄なグラデーションなどはなくなりました。</p>
+
+<p>Windows 8 で、同じようにXaml上で右クリック-テンプレートの編集から、適用されているXAMLのスタイルが簡単にコピーできます。</p>
+
+<p>&#8220;`</p>
+
+
+
+<pre><code>
+Wibndows 7 のAeroスタイルよりもまだ描画コストは減りましたが、あんまり変わりませんね。
+もっと、最適化できないか？削れないか？本当にそれは必要か？と考えた際にたどり着くのがModern Styleになります。
+
+
+
+Modern Style
+---
+
+もはやボタン枠すらもありませんが、確かにユーザーはそれを押下できるコンテンツと認識でき、何が起こるかを理解できます。
+
+![wpf-06-07]
+
+
+こうなると、XAML上のスタイルも簡単で、OSもこれを描画するためにコストはかけません。  
+かといって、ユーザーがこれを退屈なコンテンツと認識するかといえば、とてもモダンな雰囲気を受けます。
+</code></pre>
+
+
+
+<p>&#8220;`</p>
+
+<p>もはやスタイルは必要最低限で、しかしマウスが乗るとそれが実行可能なコンテンツであることを即座に理解できます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-08.png" alt="wpf-06-08" /></p>
+
+<p>ブランドカラーをカスタマイズもできます。
+しかも、これはアプリケーション ポリシーのようなもので、開発者はただ単にXaml上でButtonと定義しただけにもかかわらず、自動的にこのスタイルが適用されることになります。</p>
+
+<p>LOB開発が、モダンで先進的なWebデザインに一矢報いることも夢ではありません。</p>
+
+<p>いつものごとく、サンプル成果物はGit管理で。</p>
+
+<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 04 - コンポジットWPF　おまけでMEF]]></title>
@@ -186,82 +416,46 @@ ItemTemplateSelectorは、DataTemplateSelectorと同じで、それぞれのデ�
 利用する際には、Import属性を持つクラスのコンストラクタでCompose拡張メソッドを呼び出すことで、そのインターフェイスに自動でインスタンスが割り当てられる仕組みになります。</p>
 
 <p>以下のように利用しています。
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>public class ActionEventPolicyAttribute : Attribute, IRoutedEventPolicy
-</span><span class='line'>{
-</span><span class='line'>    public ActionEventPolicyAttribute()
-</span><span class='line'>    {
-</span><span class='line'>        this.Compose();
-</span><span class='line'>    }
-</span><span class='line'>    [Import(typeof(IExceptionPolicy))]
-</span><span class='line'>    public IExceptionPolicy ExceptionPolicy { get; set; }&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;
-</span><span class='line'>アプリケーション構成ファイル(app.config)ですが、configSectionsを利用することで、任意のセクションを追加することが可能になります。
-</span><span class='line'>これはmachin.configでも利用されているセクションです。
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>ここに二つのレベルで依存性を注入できるようにしています。
-</span><span class='line'>
-</span><span class='line'> + アセンブリの中にあるExport属性の全てをMEFのカタログに登録する
-</span><span class='line'> + アセンブリの中でも特定のクラスのみをMEFのカタログに登録する
-</span><span class='line'>
-</span><span class='line'>これによって、柔軟で且つソースコードの変更をかけずに機能を差し替えることが可能となります。
-</span><span class='line'>
-</span><span class='line'>
-</span><span class='line'>app.config
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?&gt;
-</span><span class='line'>&lt;configuration&gt;
-</span><span class='line'>  &lt;configSections&gt;
-</span><span class='line'>&lt;section name="Repository.AssemblyCatalog" type="System.Configuration.NameValueSectionHandler" /&gt;
-</span><span class='line'>&lt;section name="Repository.TypeCatalog" type="System.Configuration.NameValueSectionHandler" /&gt;
-</span><span class='line'>  &lt;/configSections&gt;
-</span><span class='line'>  &lt;Repository.AssemblyCatalog&gt;
-</span><span class='line'>&lt;add key="uEN" value="" /&gt;
-</span><span class='line'>&lt;add key="SimpleApp" value="" /&gt;
-</span><span class='line'>  &lt;/Repository.AssemblyCatalog&gt;&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  &lt;Repository.TypeCatalog&gt;
-</span><span class='line'>  &lt;/Repository.TypeCatalog&gt;</span></code></pre></td></tr></table></div></figure></p>
+&#8220;`
+    public class ActionEventPolicyAttribute : Attribute, IRoutedEventPolicy
+    {
+        public ActionEventPolicyAttribute()
+        {
+            this.Compose();
+        }
+        [Import(typeof(IExceptionPolicy))]
+        public IExceptionPolicy ExceptionPolicy { get; set; }</p>
+
+<pre><code>
+アプリケーション構成ファイル(app.config)ですが、configSectionsを利用することで、任意のセクションを追加することが可能になります。
+これはmachin.configでも利用されているセクションです。
+
+
+ここに二つのレベルで依存性を注入できるようにしています。
+
+ + アセンブリの中にあるExport属性の全てをMEFのカタログに登録する
+ + アセンブリの中でも特定のクラスのみをMEFのカタログに登録する
+
+これによって、柔軟で且つソースコードの変更をかけずに機能を差し替えることが可能となります。
+
+
+app.config
+</code></pre>
+
+<p>&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
+<configuration>
+  <configSections>
+    <section name="Repository.AssemblyCatalog" type="System.Configuration.NameValueSectionHandler" />
+    <section name="Repository.TypeCatalog" type="System.Configuration.NameValueSectionHandler" />
+  </configSections>
+  &lt;Repository.AssemblyCatalog>
+    <add key="uEN" value="" />
+    <add key="SimpleApp" value="" />
+  &lt;/Repository.AssemblyCatalog></p>
+
+<p>  &lt;Repository.TypeCatalog>
+  &lt;/Repository.TypeCatalog>
+&#8220;`</p>
 
 <hr />
 ]]></content>

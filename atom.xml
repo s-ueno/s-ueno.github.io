@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-11T01:10:31+09:00</updated>
+  <updated>2014-11-11T23:58:10+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,502 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Buttonに学ぶテンプレートとスタイル - WPF Vol 05]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/11/wpf-06/"/>
+    <updated>2014-11-11T23:58:00+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/11/wpf-06</id>
+    <content type="html"><![CDATA[<p>Buttonの外観を通じて、テンプレートおよびスタイルについて紹介します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-01.png" alt="wpf-06-01" /></p>
+
+<!-- more -->
+
+
+<h2>Windows 7 スタイル</h2>
+
+<p>WPFがこのお馴染みのスタイルを描画するためには、以下のような要件を適用しています。</p>
+
+<ul>
+<li>キーボードフォーカス(入力デバイスがキーボードがミソ。マウスじゃないよ)が入ると、ボタンの枠よりマージン2だけ小さい領域に指定した間隔の点線を描画</li>
+<li>論理フォーカスが入ると、ButtonChromeクラスがゴニョゴニョして、ボタンの後ろ側にあるコンテンツの色がアクセント色になる</li>
+<li>背景色は上から下に向かい、高さの半分からグラデーションで描画</li>
+<li>マウスがボタンの上にくるとボタンの色がアクセント色になる</li>
+<li>ボタンの上でマウスが押されている状態時に、ボタンの前景色を濃くする</li>
+<li>ボタンの文字は、内部的にContentPresenterに文字を設定しているので、自動でTextBlock化して表示されている</li>
+</ul>
+
+
+<p>などなどキリがありませんが、これらの要件をXAMLのスタイル上で以下のように表現しています。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Style x:Key="ButtonFocusVisual"&gt;
+</span><span class='line'>    &lt;Setter Property="Control.Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate&gt;
+</span><span class='line'>                &lt;Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;
+</span><span class='line'>&lt;LinearGradientBrush x:Key="ButtonNormalBackground" EndPoint="0,1" StartPoint="0,0"&gt;
+</span><span class='line'>    &lt;GradientStop Color="#F3F3F3" Offset="0"/&gt;
+</span><span class='line'>    &lt;GradientStop Color="#EBEBEB" Offset="0.5"/&gt;
+</span><span class='line'>    &lt;GradientStop Color="#DDDDDD" Offset="0.5"/&gt;
+</span><span class='line'>    &lt;GradientStop Color="#CDCDCD" Offset="1"/&gt;
+</span><span class='line'>&lt;/LinearGradientBrush&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/&gt;
+</span><span class='line'>&lt;Style x:Key="AeroButtonStyle" TargetType="{x:Type Button}"&gt;
+</span><span class='line'>    &lt;Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/&gt;
+</span><span class='line'>    &lt;Setter Property="Background" Value="{StaticResource ButtonNormalBackground}"/&gt;
+</span><span class='line'>    &lt;Setter Property="BorderBrush" Value="{StaticResource ButtonNormalBorder}"/&gt;
+</span><span class='line'>    &lt;Setter Property="BorderThickness" Value="1"/&gt;
+</span><span class='line'>    &lt;Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/&gt;
+</span><span class='line'>    &lt;Setter Property="HorizontalContentAlignment" Value="Center"/&gt;
+</span><span class='line'>    &lt;Setter Property="VerticalContentAlignment" Value="Center"/&gt;
+</span><span class='line'>    &lt;Setter Property="Padding" Value="1"/&gt;
+</span><span class='line'>    &lt;Setter Property="Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate TargetType="{x:Type Button}"&gt;
+</span><span class='line'>                &lt;Themes:ButtonChrome x:Name="Chrome" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" RenderMouseOver="{TemplateBinding IsMouseOver}" RenderPressed="{TemplateBinding IsPressed}" RenderDefaulted="{TemplateBinding IsDefaulted}" SnapsToDevicePixels="true"&gt;
+</span><span class='line'>                    &lt;ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/&gt;
+</span><span class='line'>                &lt;/Themes:ButtonChrome&gt;
+</span><span class='line'>                &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsKeyboardFocused" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="RenderDefaulted" TargetName="Chrome" Value="true"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="ToggleButton.IsChecked" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="RenderPressed" TargetName="Chrome" Value="true"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>                        &lt;Setter Property="Foreground" Value="#ADADAD"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>このStyleですが、VisualStudio上で以下のように右クリックで簡単に取得できます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-02.png" alt="wpf-06-02" /></p>
+
+<p>XAML上に <code>&lt;Button Width="150" Height="50" Content="送信する" x:Name="SampleButton"/&gt;</code> と定義するだけで、内部的にはButton用スタイルが自動で適用されているわけです。
+ボタン自体のスタイルは <code>&lt;Style x:Key="AeroButtonStyle" TargetType="{x:Type Button}"&gt;</code> から始まります。</p>
+
+<p> <code>x:Key="AeroButtonStyle"</code> とキー指定している場合は、XAML上で明示的にキーを設定しないと適用されません。</p>
+
+<p>キー指定せずに <code>&lt;Style TargetType="{x:Type Button}"&gt;</code> とStyle定義すると、全てのボタンのスタイルがこれから定義するStyleに自動で従うようになります。<br/>
+また、 <code>&lt;Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}"&gt;</code> と、BasedOnを指定することで、元になる定義済みのスタイルを適用した上で任意のスタイルを上書きすることもできます。</p>
+
+<p> <code>&lt;Setter Property="FocusVisualStyle" Value="{StaticResource ButtonFocusVisual}"/&gt;</code>
+ですが、TargetTypeが Button で Property名が &ldquo;FocusVisualStyle&rdquo; つまり <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.frameworkelement.focusvisualstyle.aspx">Button.FocusVisualStyle</a> プロパティに対して、Value=で &ldquo;ButtonFocusVisual&rdquo; というキー名の値を設定していることを表します。</p>
+
+<p>このキー名に一致するものは、以下のようになっています・</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Style x:Key="ButtonFocusVisual"&gt;
+</span><span class='line'>    &lt;Setter Property="Control.Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate&gt;
+</span><span class='line'>                &lt;Rectangle Margin="2" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Margin=&ldquo;2&rdquo; で StrokeThickness=&ldquo;1&rdquo; StrokeDashArray=&ldquo;1 2&#8221;のRectangleを描画していますね。<br/>
+確かにTabでキーボードフォーカスを入れると、ちょっと小さな枠に点線で四角が描画されていませんか？</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-03.png" alt="wpf-06-03" /></p>
+
+<p>WPFが標準で提供する組込みコントロールも、最小限の部品（LabelやTextBlock、Rectangle）を組み合わせて構成されていることがわかります。
+なので、これら最小限の部品に対しては、デフォルトでスタイルが適用されるようなことをやってはなりません。</p>
+
+<p> <code>&lt;Style TargetType="{x:Type TextBlock}"&gt;</code> とかすると、TextBlockはいたるところで利用されているので画面がまともに描画されなくなります。</p>
+
+<p>といっても、テキストブロック用のStyleを用意したい場合には <code>&lt;Style x:Key="MyTextBlock" TargetType="{x:Type TextBlock}"&gt;</code> のようにキーを明示的に宣言して、他のコントロールに影響がでないようにします。</p>
+
+<p>次に <code>&lt;Setter Property="</code> とプロパティ値をカスタマイズしていきますが、この際にスタイルをダイナミックに適用することもできます。</p>
+
+<p> <code>&lt;Setter Property="Background" Value="{DynamicResource MyBackgroundBrush}"/&gt;</code></p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms748942.aspx">DynamicResource</a>ですが、これは要素が実際にテンプレートを必要とする（描画）段階で、キー名で検索して適用します。
+StaticResourceが定数としたら、DynamicResourceは書き換え可能な変数というところでしょうか。</p>
+
+<p>アプリケーションはそのブランドイメージに見合う色などがあります。
+このブログも今は白とブルーを基調としたイメージカラーになっています。
+このようなイメージカラーをたとえば、カラーピッカーなどを利用してアプリケーションの実行中にダイナミックに変更することが可能になります。</p>
+
+<h2>テンプレート</h2>
+
+<p>Xamlを利用して、様々なStyleを作成していく中で、 <code>&lt;Setter Property="Template"&gt;</code> については、特別な意味があります。
+<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.control.template.aspx">Button.Template</a> プロパティは、このボタンの外観に関する全てを新しく書き換えることを意味します。</p>
+
+<p>Windows7のAeroスタイル例を整理しながら説明します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Setter Property="Template"&gt;
+</span><span class='line'>    &lt;Setter.Value&gt;
+</span><span class='line'>        &lt;ControlTemplate TargetType="{x:Type Button}"&gt;
+</span><span class='line'>            &lt;Themes:ButtonChrome x:Name="Chrome" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" RenderMouseOver="{TemplateBinding IsMouseOver}" RenderPressed="{TemplateBinding IsPressed}" RenderDefaulted="{TemplateBinding IsDefaulted}" SnapsToDevicePixels="true"&gt;
+</span><span class='line'>                &lt;ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/&gt;
+</span><span class='line'>            &lt;/Themes:ButtonChrome&gt;
+</span><span class='line'>        &lt;/ControlTemplate&gt;
+</span><span class='line'>    &lt;/Setter.Value&gt;
+</span><span class='line'>&lt;/Setter&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>&lt;ControlTemplate TargetType="{x:Type Button}"&gt;</code> として、Buttonの外観を再定義しています。</p>
+
+<p>その中身は <code>&lt;Themes:ButtonChrome ・・・</code> として、<a href="http://msdn.microsoft.com/ja-jp/library/microsoft.windows.themes.buttonchrome.aspx">Microsoft.Windows.Themes.ButtonChrome</a> クラスを指定しています。
+仮にココにCheckBoxを指定した場合は、開発者はButtonをXamlに定義しているにもかかわらず、実行してみると画面上にはチェックボックスが表示されることになります。これがテンプレートです。</p>
+
+<p>各種プロパティに設定している<a href="http://msdn.microsoft.com/ja-jp/library/ms742882.aspx">TemplateBinding</a>は、別のコントロール プロパティ値を参照するバインディング機能になります。
+ここでは、ButtonChrome.BorderBrushは、ControlTemplateで定義されているButton(つまりもともとのコントロール)のBorderBrush値を参照するように設定されています。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms742882.aspx">TemplateBinding</a> はより具体的で柔軟な設定を可能とし、例えば2個上の親コンテンツのプロパティ値や、指定した親の型が見つかればその値を利用するなど、カスタム コントロールを作成するレベルでは、とても重宝するバインディング機能の一つです。</p>
+
+<p>WPFはバインディングとテンプレートが肝要と紹介する所以です。</p>
+
+<p><code>&lt;ContentPresenter ・・・</code> は Botton.Contentプロパティに設定した&#8221;送信する&#8221;という表示文字列が、ContentPresenterに設定された結果、前に説明した通りTextBlockとして画面に表示されることになります。</p>
+
+<p>WPFのデバック機能で、ビジュアライザーというものがあります。
+これを通して、外観を確認すると、なるほどとなります。</p>
+
+<p>サンプルボタン</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-04.png" alt="wpf-06-04" /></p>
+
+<p>そのテンプレートの最終的なContentPresenter</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-05.png" alt="wpf-06-05" /></p>
+
+<p>次に、先ほどは省略しましたが ControlTemplate に、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.controltemplate.triggers.aspx">ControlTemplate.Triggers</a> プロパティ値を設定していたと思います。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>    &lt;Trigger Property="IsKeyboardFocused" Value="true"&gt;
+</span><span class='line'>        &lt;Setter Property="RenderDefaulted" TargetName="Chrome" Value="true"/&gt;
+</span><span class='line'>    &lt;/Trigger&gt;
+</span><span class='line'>    &lt;Trigger Property="ToggleButton.IsChecked" Value="true"&gt;
+</span><span class='line'>        &lt;Setter Property="RenderPressed" TargetName="Chrome" Value="true"/&gt;
+</span><span class='line'>    &lt;/Trigger&gt;
+</span><span class='line'>    &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>        &lt;Setter Property="Foreground" Value="#ADADAD"/&gt;
+</span><span class='line'>    &lt;/Trigger&gt;
+</span><span class='line'>&lt;/ControlTemplate.Triggers&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これがXAMLが単なる<a href="http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E8%A8%98%E8%BF%B0%E8%A8%80%E8%AA%9E">データ記述言語</a>よりも優れていて、なんらかのイベント トリガーをキーに動的にプロパティ値を変更することができる技術になります。</p>
+
+<p>キーボードフォーカスを受け取ったときや、非活性時にはそれに見合ったスタイルを動的に適用することができます。</p>
+
+<p>こういった様々なXAML上の技術が適用されてWindows7のAeroスタイルが適用されていますが、ここで考えたいのが</p>
+
+<blockquote><p>“What is the difference between art and design?”（デザインとアートの違いとは何か？）</p>
+
+<p>”Design solves a problem, art is expression”（デザインとは問題解決であり、アートとは自己表現である。）</p>
+
+<p>Why?をBecauseで説明出来なければ、それは明らかにデザインではない</p></blockquote>
+
+<p>です。</p>
+
+<p>これを素で開発するとした場合は、開発者には高い技術力を求め、OSもこれを描画するための高いコストを支払います。
+果たして、これに対して Because を説明できるでしょうか？</p>
+
+<p>そうした結果が、Windows8 Styleや Flat Ftyleにつながりますが、果たしてまだ最適化はできないものでしょうか？</p>
+
+<h2>Windows8 Style</h2>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-06.png" alt="wpf-06-06" /></p>
+
+<p>Flat Styleはボタンを押下すると、ブランド カラー が表示されています。<br/>
+どちらも、無駄なグラデーションなどはなくなりました。</p>
+
+<p>Windows 8 で、同じようにXaml上で右クリック-テンプレートの編集から、適用されているXAMLのスタイルが簡単にコピーできます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Style x:Key="FlatButtonStyle" TargetType="{x:Type Button}"&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;!-- アプリケーションで統一的なフォント、サイズなどをダイナミックに適用 --&gt;
+</span><span class='line'>&lt;Setter Property="Foreground"                   Value="{DynamicResource AppForeground}"/&gt;
+</span><span class='line'>&lt;Setter Property="FontFamily"                   Value="{DynamicResource AppFont}"/&gt;
+</span><span class='line'>&lt;Setter Property="FontSize"                     Value="{DynamicResource AppFontSize}"/&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;!-- ボタン特有のスタイル --&gt;
+</span><span class='line'>&lt;Setter Property="Background"                   Value="{DynamicResource ButtonBackground}"/&gt;
+</span><span class='line'>&lt;Setter Property="BorderBrush"                  Value="{DynamicResource ButtonBorder}"/&gt;
+</span><span class='line'>&lt;Setter Property="FocusVisualStyle"             Value="{x:Null}"/&gt;
+</span><span class='line'>&lt;Setter Property="BorderThickness"              Value="1,1,1,1"/&gt;
+</span><span class='line'>&lt;Setter Property="HorizontalContentAlignment"   Value="Center"/&gt;
+</span><span class='line'>&lt;Setter Property="VerticalContentAlignment"     Value="Center"/&gt;
+</span><span class='line'>&lt;Setter Property="Template"&gt;
+</span><span class='line'>    &lt;Setter.Value&gt;
+</span><span class='line'>        &lt;ControlTemplate TargetType="{x:Type Button}"&gt;
+</span><span class='line'>            &lt;Border x:Name="border" 
+</span><span class='line'>                    BorderBrush="{TemplateBinding BorderBrush}" 
+</span><span class='line'>                    BorderThickness="{TemplateBinding BorderThickness}" 
+</span><span class='line'>                    Background="{TemplateBinding Background}" 
+</span><span class='line'>                    SnapsToDevicePixels="True"&gt;
+</span><span class='line'>                &lt;ContentPresenter x:Name="contentPresenter" 
+</span><span class='line'>                                  ContentTemplate="{TemplateBinding ContentTemplate}" 
+</span><span class='line'>                                  Content="{TemplateBinding Content}" 
+</span><span class='line'>                                  ContentStringFormat="{TemplateBinding ContentStringFormat}" 
+</span><span class='line'>                                  Focusable="False" 
+</span><span class='line'>                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+</span><span class='line'>                                  Margin="{TemplateBinding Padding}" 
+</span><span class='line'>                                  RecognizesAccessKey="True" 
+</span><span class='line'>                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+</span><span class='line'>                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/&gt;
+</span><span class='line'>            &lt;/Border&gt;
+</span><span class='line'>            &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>                    &lt;Setter Property="Foreground" Value="{DynamicResource AppForegroundDisabled}"/&gt;
+</span><span class='line'>                    &lt;Setter Property="Background" Value="{DynamicResource AppDisabled}"/&gt;
+</span><span class='line'>                &lt;/Trigger&gt;
+</span><span class='line'>                &lt;Trigger Property="IsMouseOver" Value="True"&gt;
+</span><span class='line'>                    &lt;Setter Property="Background" Value="{DynamicResource ButtonBackgroundHover}" /&gt;
+</span><span class='line'>                    &lt;Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderHover}"/&gt;
+</span><span class='line'>                    &lt;Setter Property="Foreground" Value="{DynamicResource ButtonTextHover}"/&gt;
+</span><span class='line'>                &lt;/Trigger&gt;
+</span><span class='line'>                &lt;Trigger Property="IsPressed" Value="True"&gt;
+</span><span class='line'>                    &lt;Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" /&gt;
+</span><span class='line'>                    &lt;Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderPressed}"/&gt;
+</span><span class='line'>                    &lt;Setter Property="Foreground" Value="{DynamicResource ButtonTextPressed}"/&gt;
+</span><span class='line'>                &lt;/Trigger&gt;
+</span><span class='line'>                &lt;Trigger Property="IsFocused" Value="true"&gt;
+</span><span class='line'>                    &lt;Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource AppBrand}" /&gt;
+</span><span class='line'>                &lt;/Trigger&gt;
+</span><span class='line'>            &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>        &lt;/ControlTemplate&gt;
+</span><span class='line'>    &lt;/Setter.Value&gt;
+</span><span class='line'>&lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Wibndows 7 のAeroスタイルよりもまだ描画コストは減りましたが、あんまり変わりませんね。
+もっと、最適化できないか？削れないか？本当にそれは必要か？と考えた際にたどり着くのがModern Styleになります。</p>
+
+<h2>Modern Style</h2>
+
+<p>もはやボタン枠すらもありませんが、確かにユーザーはそれを押下できるコンテンツと認識でき、何が起こるかを理解できます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-07.png" alt="wpf-06-07" /></p>
+
+<p>こうなると、XAML上のスタイルも簡単で、OSもこれを描画するためにコストはかけません。<br/>
+かといって、ユーザーがこれを退屈なコンテンツと認識するかといえば、とてもモダンな雰囲気を受けます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Style x:Key="ModernButtonStyle" TargetType="{x:Type Button}" &gt;
+</span><span class='line'>&lt;Setter Property="Foreground"                   Value="{DynamicResource AppBrand}" /&gt;
+</span><span class='line'>&lt;Setter Property="FontFamily"                   Value="{DynamicResource AppFont}"/&gt;
+</span><span class='line'>&lt;Setter Property="FontSize"                     Value="{DynamicResource AppFontSize}"/&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;Setter Property="FocusVisualStyle"             Value="{x:Null}"/&gt;
+</span><span class='line'>&lt;Setter Property="HorizontalContentAlignment"   Value="Center"/&gt;
+</span><span class='line'>&lt;Setter Property="VerticalContentAlignment"     Value="Center"/&gt;
+</span><span class='line'>&lt;Setter Property="Focusable"                    Value="False" /&gt;
+</span><span class='line'>&lt;Setter Property="Template"&gt;
+</span><span class='line'>    &lt;Setter.Value&gt;
+</span><span class='line'>        &lt;ControlTemplate TargetType="Button"&gt;
+</span><span class='line'>            &lt;TextBlock Name="chrome" 
+</span><span class='line'>                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+</span><span class='line'>                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"&gt;
+</span><span class='line'>                &lt;ContentPresenter /&gt;
+</span><span class='line'>            &lt;/TextBlock&gt;                
+</span><span class='line'>            &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                &lt;Trigger Property="IsMouseOver" Value="true"&gt;
+</span><span class='line'>                    &lt;Setter TargetName="chrome" Property="TextBlock.TextDecorations" Value="Underline" /&gt;
+</span><span class='line'>                &lt;/Trigger&gt;
+</span><span class='line'>            &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>        &lt;/ControlTemplate&gt;
+</span><span class='line'>    &lt;/Setter.Value&gt;
+</span><span class='line'>&lt;/Setter&gt;
+</span><span class='line'>&lt;Style.Triggers&gt;
+</span><span class='line'>    &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>        &lt;Setter Property="Foreground" Value="{DynamicResource AppForegroundDisabled}"/&gt;
+</span><span class='line'>    &lt;/Trigger&gt;
+</span><span class='line'>&lt;/Style.Triggers&gt;
+</span><span class='line'>&lt;/Style&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>もはやスタイルは必要最低限で、しかしマウスが乗るとそれが実行可能なコンテンツであることを即座に理解できます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-08.png" alt="wpf-06-08" /></p>
+
+<p>ブランドカラーをカスタマイズもできます。
+しかも、これはアプリケーション ポリシーのようなもので、開発者はただ単にXaml上でButtonと定義しただけにもかかわらず、自動的にこのスタイルが適用されることになります。</p>
+
+<p>LOB開発が、モダンで先進的なWebデザインに一矢報いることも夢ではありません。</p>
+
+<p>いつものごとく、サンプル成果物はGit管理で。</p>
+
+<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[What Is the Difference Between Art and Design?]]></title>
