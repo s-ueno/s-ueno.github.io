@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-11T23:58:10+09:00</updated>
+  <updated>2014-11-15T03:19:44+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,360 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Windowに学ぶテンプレートと添付プロパティ - WPF Vol 06]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/15/wpf-07/"/>
+    <updated>2014-11-15T03:19:00+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/15/wpf-07</id>
+    <content type="html"><![CDATA[<p>従来型の開発ではButtonクラスの外観や機能を変更したい場合は、派生させButtonExカスタムコントロールを作成していました。
+しかし前回紹介したように、XamlではButtonクラスにスタイルとテンプレートを適用することで、外観をカスタマイズできることを確認しました。</p>
+
+<p>では今度は Window をストアアプリのようなモダンなものに変えたいと思います。
+また、スタイルだけではなくそこで発生するイベントも添付プロパティを利用して、外部から制御したいと思います。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-01.png" alt="wpf-07-01" /></p>
+
+<!-- more -->
+
+
+<p>イメージのWindowは <code>var window = new Window();</code> としているだけで、特にStyleを明示的に設定はしていません。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.application.aspx">System.Windows.Application</a> クラスのリソースに、 <code>&lt;Style TargetType="{x:Type Window}"&gt;</code> と宣言しているリソースディクショナリを登録しているため、デフォルトでこのスタイルで表示されるようになっています。</p>
+
+<p>次に、MSDN で <a href="http://msdn.microsoft.com/ja-jp/library/ms748948.aspx">WPF ウィンドウの概要</a> として紹介している以下の図がわかりやすいのですが</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-02.png" alt="wpf-07-02" /></p>
+
+<p>最小・最大ボタンや境界線などデフォルトで表示されるものをOFFにし、Windowクラスの外観であるクライアント領域内ですべて実装しています。</p>
+
+<p> <code>&lt;Setter Property="Template"&gt;</code> とTemplateを差し替える前までは、お決まりのスタイルである、前景色、背景色、フォントなどをDynamicResource で設定します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+</span><span class='line'>                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+</span><span class='line'>                     xmlns:local="clr-namespace:uEN.UI.AttachedProperties"
+</span><span class='line'>                    &gt;
+</span><span class='line'>    &lt;Style TargetType="{x:Type Window}"&gt;
+</span><span class='line'>        &lt;Setter Property="Foreground"                   Value="{DynamicResource AppForeground}"/&gt;
+</span><span class='line'>        &lt;Setter Property="FontFamily"                   Value="{DynamicResource AppFont}"/&gt;
+</span><span class='line'>        &lt;Setter Property="FontSize"                     Value="{DynamicResource AppFontSize}"/&gt;
+</span><span class='line'>        &lt;Setter Property="Background"                   Value="{DynamicResource WindowTheme}"/&gt;
+</span><span class='line'>        &lt;Setter Property="BorderBrush"                  Value="{DynamicResource AppBrand}"/&gt;
+</span><span class='line'>        &lt;Setter Property="BorderThickness"              Value="3" /&gt;
+</span><span class='line'>        &lt;Setter Property="Focusable"                    Value="False" /&gt;
+</span><span class='line'>        &lt;Setter Property="FocusVisualStyle"             Value="{x:Null}"/&gt;
+</span><span class='line'>        &lt;Setter Property="WindowStyle"                  Value="None" /&gt;
+</span><span class='line'>        &lt;Setter Property="AllowsTransparency"           Value="True" /&gt;
+</span><span class='line'>        &lt;Setter Property="ResizeMode"                   Value="CanResizeWithGrip" /&gt;
+</span><span class='line'>        &lt;Setter Property="WindowChrome.WindowChrome"&gt;
+</span><span class='line'>            &lt;Setter.Value&gt;
+</span><span class='line'>                &lt;WindowChrome ResizeBorderThickness="10" /&gt;
+</span><span class='line'>            &lt;/Setter.Value&gt;
+</span><span class='line'>        &lt;/Setter&gt;
+</span><span class='line'>        &lt;Setter Property="Template"&gt;
+</span><span class='line'>            &lt;Setter.Value&gt;
+</span><span class='line'>                &lt;ControlTemplate TargetType="{x:Type Window}"&gt;
+</span><span class='line'>                    &lt;Border BorderBrush="{TemplateBinding BorderBrush}" 
+</span><span class='line'>                            BorderThickness="{TemplateBinding BorderThickness}" 
+</span><span class='line'>                            Background="{TemplateBinding Background}"&gt;
+</span><span class='line'>                        &lt;Grid x:Name="PART_rootGrid"&gt;
+</span><span class='line'>                            &lt;Grid.RowDefinitions&gt;
+</span><span class='line'>                                &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>                                &lt;RowDefinition Height="*"/&gt;
+</span><span class='line'>                                &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>                            &lt;/Grid.RowDefinitions&gt;
+</span><span class='line'>                            &lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>                                &lt;ColumnDefinition Width="*"/&gt;
+</span><span class='line'>                            &lt;/Grid.ColumnDefinitions&gt;
+</span><span class='line'>                   ・
+</span><span class='line'>                   ・
+</span><span class='line'>                   ・</span></code></pre></td></tr></table></div></figure>
+
+
+<p>BorderBrush、BorderThicknessは、<code>&lt;Setter Property="Template"&gt;</code> でこれから差し替えるControlTemplate の最初に</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ControlTemplate TargetType="{x:Type Window}"&gt;
+</span><span class='line'>    &lt;Border BorderBrush="{TemplateBinding BorderBrush}" 
+</span><span class='line'>            BorderThickness="{TemplateBinding BorderThickness}" 
+</span><span class='line'>            Background="{TemplateBinding Background}"&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>としてBorderを用意しTemplateBindingでバインドすることで、画像のように全体の枠線が色付きで表示されるようになっています。</p>
+
+<p>WindowStyleをNone、AllowsTransparencyをTrueとすることで、境界線や最小最大化ボタンの領域が見えなくなります。
+ただ、それではWindowを動かせなくなることや、大きさを変更できなくなるので、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.shell.windowchrome.windowchrome.aspx">WindowChrome.WindowChrome</a> 添付プロパティを利用して、Windowの大きさを変更できるための領域幅を指定した新しいWindowChromeを設定しています。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;!-- WindowChromeは.Net4.5から提供されている機能 --&gt;
+</span><span class='line'>&lt;Setter Property="WindowChrome.WindowChrome"&gt;
+</span><span class='line'>    &lt;Setter.Value&gt;
+</span><span class='line'>        &lt;WindowChrome ResizeBorderThickness="10" /&gt;
+</span><span class='line'>    &lt;/Setter.Value&gt;
+</span><span class='line'>&lt;/Setter&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これで、リサイズやWibdowの移動ができるようになります。
+あとは作成したい画面構成をイメージしながらGridを利用してレイアウトを区切っていきます。</p>
+
+<p>まず、以下のようにしました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-03.png" alt="wpf-07-03" /></p>
+
+<p>Gridを行単位で区切り、上部と下部を可変幅( <code>&lt;RowDefinition Height="auto"/&gt;</code> )、真ん中を領域いっぱいに利用(<code>&lt;RowDefinition Height="*"/&gt;</code>)するように宣言します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> &lt;Grid x:Name="PART_rootGrid"&gt;
+</span><span class='line'>     &lt;Grid.RowDefinitions&gt;
+</span><span class='line'>         &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>         &lt;RowDefinition Height="*"/&gt;
+</span><span class='line'>         &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>     &lt;/Grid.RowDefinitions&gt;
+</span><span class='line'>     &lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>         &lt;ColumnDefinition Width="*"/&gt;
+</span><span class='line'>     &lt;/Grid.ColumnDefinitions&gt;
+</span><span class='line'>     
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>こうなると、もう普通のXamlで画面を開発するのと同じように、Style上でControlTemmplateの中身を記述していきます。</p>
+
+<p>まず、Grid上部に対して詳細レイアウトをイメージし、その通りに新しくGridを配置します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-04.png" alt="wpf-07-04" /></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> &lt;!-- Grid.Row="0"として、親のグリッドの最初の行であることを宣言する --&gt;
+</span><span class='line'> &lt;Grid Grid.Row="0" Height="100"&gt;
+</span><span class='line'>     &lt;Grid.RowDefinitions&gt;
+</span><span class='line'>         &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>         &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>         &lt;RowDefinition Height="*"/&gt;
+</span><span class='line'>         &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>     &lt;/Grid.RowDefinitions&gt;
+</span><span class='line'>     &lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>         &lt;ColumnDefinition Width="auto"/&gt;
+</span><span class='line'>         &lt;ColumnDefinition Width="auto"/&gt;
+</span><span class='line'>         &lt;ColumnDefinition Width="*"/&gt;
+</span><span class='line'>         &lt;ColumnDefinition Width="*"/&gt;
+</span><span class='line'>     &lt;/Grid.ColumnDefinitions&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>次に0列目、4行をまたがっている領域を利用します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-05.png" alt="wpf-07-05" /></p>
+
+<p>これは日本人にはなじみ深いExcelのセルをマージする要領ですね。
+<code>Grid.Column="0" Grid.RowSpan="4"</code>　とすることで、そのようなマージされた領域を利用できます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Border Margin="10,0,5,0" Width="10" Grid.Column="0" Grid.RowSpan="4" Background="{DynamicResource AppBrand}" &gt;
+</span><span class='line'>    &lt;Border.RenderTransform&gt;
+</span><span class='line'>        &lt;TransformGroup&gt;
+</span><span class='line'>            &lt;SkewTransform AngleY="50" /&gt;
+</span><span class='line'>        &lt;/TransformGroup&gt;
+</span><span class='line'>    &lt;/Border.RenderTransform&gt;
+</span><span class='line'>&lt;/Border&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>そこにBorder でブランドカラーの四角形を描画しています。
+ただ、その四角形はWPFの強力な2Dグラフィック機能を利用して、少し角度をつけて描画しています。</p>
+
+<p>ブランドに注目を集める事、アプリケーションのテーマカラーを確認できることを目的にしています。</p>
+
+<p>次にブランドを表示する箇所です。同じようにグリッドのセルの座標を指定して領域を確保しますが、ここの文字はアプリケーションによって異なります。
+そのため、バインドする必要があります。</p>
+
+<p>このシリースはWindow.ContentにViewModelを、ContentTemplateSelectorを利用してViewを表示しています。</p>
+
+<p>なので、このコンテンツにとって、バインドする際のプロパティまでのパスは、Content.(ViewModelのプロパティ名)とし、それを解決するための相対的な位置をバインディングに指定しています。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-06.png" alt="wpf-07-06" /></p>
+
+<p>ViewModelの基底クラスにプロパティを用意することで、デフォルトで適用するもしくは開発者がViewModel側で任意に設定して表示することが可能となります。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>public string CompanyName
+</span><span class='line'>{
+</span><span class='line'>    get { return companyName; }
+</span><span class='line'>    set { SetProperty(ref companyName, value); }
+</span><span class='line'>}
+</span><span class='line'>private string companyName = BizUtils.AppSettings("CompanyName", "");
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>後は同じようにデザインしていくのですが、今回は最小最大ボタンと設定ボタンという任意のボタンを配置しました。</p>
+
+<p>最大最小のボタン デザイン面では、描画に<a href="http://www.itmedia.co.jp/help/tips/windows/w0288.html">Marlett</a> フォントを利用しています。
+また、×ボタンはフォーカスを受け取ると、赤で強調表示されるようにしています。</p>
+
+<p>設定マークは <a href="http://modernuiicons.com/%E3%80%80">Alex Peattie</a>さんのフリーのXamlのジオメトリを利用しています。</p>
+
+<p>ただ、レイアウトを用意するのは良いのですが、ここにクリックされた際の実装が必要になります。
+そこで登場するのが、添付プロパティです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-07.png" alt="wpf-07-07" /></p>
+
+<p><code>local:WindowProxy.Command="Close"</code></p>
+
+<p>WPFの組み込みコントロールクラスとは関係のない、別クラスで宣言した添付プロパティをセットし、処理を注入することができます。</p>
+
+<p>VisualStudioのコードスニペット機能を利用してpropaと入力すると自動で添付プロパティが作成されます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-08.png" alt="wpf-07-08" /></p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-09.png" alt="wpf-07-09" /></p>
+
+<p>今回はWindowの最小・最大　+　設定ボタンの押下時の処理を実装する添付プロパティクラスを用意しました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-07-10.png" alt="wpf-07-10" /></p>
+
+<p>プロパティ値の変更時に処理が動くメソッドが定義できます。
+ここで、ボタンに対してクリック時のイベントをバインドしています。</p>
+
+<p>Styleで外観を刷新でき、処理も添付プロパティを利用して注入できるということは、たとえば、開発者はWPFの組込済みテキストボックスを配置、あとは提供されている任意の添付プロパティを選択すれば、自動で数値用テキストボックスや入力自動補完テキストボックスなどに差し替わることが可能となります。</p>
+
+<p>ちなみに、Buttonクラスは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.buttonbase.command.aspx">Button.Command</a>プロパティが用意されていて、ここに組み込み済みのICommandを割り当てることもできます。
+たとえば、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.systemcommands.aspx">SystemCommands</a>などです。</p>
+
+<p>そうなのですが・・・・どうしてICoomandをプロパティに持つという条件付の機能にしたのでしょうか？
+それこそ添付プロパティとして、任意のルーティングイベントと紐付けられるように提供してくれれば、良かったのですが。</p>
+
+<p>なぜかというと、前回のようにボタンから不要な機能をすべて削り落としていくと</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-06-08.png" alt="wpf-06-08" /></p>
+
+<p>もうテンプレートの中にはCommandプロパティを持つButtonの要素は存在しないのですよね。。。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Style x:Key="ModernButtonStyle" TargetType="{x:Type Button}" &gt;
+</span><span class='line'>    &lt;Setter Property="Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate TargetType="Button"&gt;
+</span><span class='line'>                &lt;TextBlock Name="chrome" 
+</span><span class='line'>                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+</span><span class='line'>                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"&gt;
+</span><span class='line'>                    &lt;ContentPresenter /&gt;
+</span><span class='line'>                &lt;/TextBlock&gt;
+</span><span class='line'>                &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsMouseOver" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter TargetName="chrome" Property="TextBlock.TextDecorations" Value="Underline" /&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>TextBlockとContentPresenterしか要素がないので、Commandを設定しても動きません。
+この制約は、添付プロパティの自由度と比べると見劣りしてしまいます。</p>
+
+<p>ちなみに、今回はまだ設定ボタン押下時の処理を実装していません。
+次回は、この設定ボタンを押下すると、アニメーションしながら設定画面が表示されるようにしたいと思います。</p>
+
+<p>サンプル成果物はGit管理で。</p>
+
+<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Buttonに学ぶテンプレートとスタイル - WPF Vol 05]]></title>
