@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Wpf | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-15T09:30:31+09:00</updated>
+  <updated>2014-11-17T19:54:33+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,289 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ユーザーコントロールに学ぶ様々なコンテンツ - WPF Vol 07]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/17/wpf-08/"/>
+    <updated>2014-11-17T19:44:57+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/17/wpf-08</id>
+    <content type="html"><![CDATA[<p>設定メニューの作成を通じて、ユーザーコントロールについて紹介します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-01.png" alt="wpf-08-01" /></p>
+
+<!-- more -->
+
+
+<p>WPFは柔軟で StyleやTemplate、添付プロパティで多くは対応できるのですが、場合によっては以下のようなレベルでコントロールを作成する場面も出てきます。</p>
+
+<ul>
+<li>ユーザーコントロール</li>
+<li>カスタムコントロール</li>
+<li>カスタム要素</li>
+</ul>
+
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms745025.aspx">MSDNにも記載</a>があります。</p>
+
+<p>また、これらをクラス ライブラリとして開発する場合と、アプリケーションとして開発する場合で適用するプログラミング デザインパターンも変わってきます。</p>
+
+<p>本シリーズのビューの基本クラスとなるBizViewクラスはUserControl派生です。
+その基本機能を実装する上でMVVMパターンで作成しているかといえば、クラスライブラリとしての基本セットなのでそうではありません。</p>
+
+<h2>ユーザーコントロール</h2>
+
+<p>VisualStudioで、新しい項目を追加する場合に選択できます。<br/>
+ベースクラスがUserControlクラスになります。</p>
+
+<p>主な目的は、より要件に具体的なビューを提供済みのコンテンツを組み合わせて構築することです。<br/>
+たとえば、BizViewクラスから派生したView/ViewModelの各種コンテンツ(サンプルのVol04View/Vol05Viewなど)も同様に、目的とする画面をボタンやラベルといった提供済みコンテンツを配置して作成しています。</p>
+
+<p>それと比べて、カスタムコントロールやカスタム要素は、WPFの組込済みコントロール(Buttonのベースクラスは)がそうであるように、基本となるコンテンツ作成として利用します。</p>
+
+<p>FrameworkElement派生ではパフォーマンスが向上しますが、実装する際には <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.media.drawingvisual.aspx">DrawingVisual</a> クラスなどを利用して、描画を実装する必要が出てきます。</p>
+
+<p>さて、今回は画面の右側に表示する設定画面をユーザーコントロールで作成します。<br/>
+画面は以下の構成で、コンテンツ部には指定したView/ViewModelのセットが追加できるよう検討します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-03.png" alt="wpf-08-03" /></p>
+
+<p>ユーザーコントロールなので、Xamlで画面を開発する要領で作成します。</p>
+
+<p>Xamlも上から下まで30行程度です。</p>
+
+<ul>
+<li>グリッドをデザイン通りに上下分割</li>
+<li>上部にタイトルとアイコン</li>
+<li>下部に設定タイトル一覧とメインコンテンツ</li>
+</ul>
+
+
+<p>を配置しています。</p>
+
+<pre><code>&lt;UserControl x:Class="uEN.UI.Controls.Settings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:uen="clr-namespace:uEN.UI"
+             mc:Ignorable="d" 
+             Background="{DynamicResource AppBrand}"
+             Foreground="White"
+             BorderBrush="Transparent"
+             d:DesignHeight="300" d:DesignWidth="300"&gt;
+    &lt;UserControl.Resources&gt;
+        &lt;uen:ViewDataTemplateSelector x:Key="templateSelector" /&gt;
+    &lt;/UserControl.Resources&gt;
+    &lt;Grid&gt;
+        &lt;Grid.RowDefinitions&gt;
+            &lt;RowDefinition Height="auto"/&gt;
+            &lt;RowDefinition Height="*"/&gt;
+        &lt;/Grid.RowDefinitions&gt;
+        &lt;StackPanel Margin="10,30,0,30" Orientation="Horizontal"&gt;
+            &lt;Button x:Name="IconButton" Width="35" Height="35" Margin="5" 
+                    Foreground="White"
+                    BorderBrush="White"
+                    Style="{DynamicResource EllipseButtonStyle}" 
+                    &gt;
+                &lt;Viewbox Stretch="Fill"&gt;
+                    &lt;Path Style="{DynamicResource PathButtonStyle}"
+                          Data="F1 M 33.6458,38L 49.4792,53.8333L 38.7917,53.8333L 22.1667,38L 38.7917,22.1667L 49.4792,22.1667L 33.6458,38 Z "/&gt;
+                &lt;/Viewbox&gt;
+            &lt;/Button&gt;
+            &lt;TextBlock x:Name="Caption" Text="Settings" FontSize="20" VerticalAlignment="Center"/&gt;
+        &lt;/StackPanel&gt;
+        &lt;ListBox Grid.Row="1" x:Name="SettingViewModels" Visibility="Visible" /&gt;
+        &lt;ContentPresenter Grid.Row="1" x:Name="ViewModelPresenter"  
+                          ContentTemplateSelector="{StaticResource templateSelector}"
+                          /&gt;
+    &lt;/Grid&gt;
+&lt;/UserControl&gt;
+</code></pre>
+
+<p>アイコンのジオメトリも前回同様に<a href="http://modernuiicons.com/">Alex Peattie</a>さんのものを利用しています。</p>
+
+<p>ボタンは丸く描画されるように <code>Style="{DynamicResource EllipseButtonStyle}"</code> としてスタイルをリソースとして切り出し、コンテンツにジオメトリを設定しています。</p>
+
+<p>切り出したスタイルは単に  <code>&lt;Setter Property="Template"&gt;</code> としてControlTemplateを設定する際に、Mindwos 8 Styleではフラットで角なしの線を描画するために <code>&lt;Border&gt;</code> としましたが、これを <code>&lt;Ellipse&gt;</code> として丸にすればそれだけでOKです。</p>
+
+<p>ボタンを押したときの内部動作はコードビハインド上で記述しています。<br/>
+(クラス ライブラリとしての開発)</p>
+
+<p>アプリケーション構成ファイルに任意のViewModelを設定すると、それが設定画面の一覧に表示されるようにしました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-04.png" alt="wpf-08-04" /></p>
+
+<p>あとは、これをWindow Style で定義しているグリッド上にコンテンツとして配置するだけです。</p>
+
+<h2>アニメーション</h2>
+
+<p>ボタンを押下する度に先ほど作成したユーザーコントロールがWindowとしてモーダル表示されたり、画面上にパッとでたり消えたりするのは、利用者としては新鮮さにかけます。
+XAMLで作成するアプリケーションのゴールは、やはり柔軟なアニメーションを利用者に体験してもらうことにあります。</p>
+
+<p>今回は、そんなアニメーションを添付プロパティとして切り出して実装しています。</p>
+
+<pre><code>
+  public enum TransitionStyle
+    {
+        None,
+
+        Slide,
+        VerticalSlide,
+
+        SlideOut,
+        VerticalSlideOut,
+    }
+
+    public class ViewTransition
+    {
+        public static TransitionStyle GetTransitionStyle(DependencyObject obj)
+        {
+            return (TransitionStyle)obj.GetValue(TransitionStyleProperty);
+        }
+
+        public static void SetTransitionStyle(DependencyObject obj, TransitionStyle value)
+        {
+            obj.SetValue(TransitionStyleProperty, value);
+        }
+
+        // Using a DependencyProperty as the backing store for TransitionStyle.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TransitionStyleProperty =
+            DependencyProperty.RegisterAttached("TransitionStyle", typeof(TransitionStyle), typeof(ViewTransition), new UIPropertyMetadata(TransitionStyle.None, OnTransitionStyleChanged));
+
+        private static void OnTransitionStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var fw = d as FrameworkElement;
+            var style = e.NewValue as TransitionStyle?;
+            if (!style.HasValue || style == TransitionStyle.None)
+                return;
+
+            fw.Loaded -= fw_Loaded;
+            fw.Loaded += fw_Loaded;
+        }
+
+        static void fw_Loaded(object sender, RoutedEventArgs e)
+        {
+            var fw = (FrameworkElement)sender;
+            var style = GetTransitionStyle(fw);
+
+            Play(fw, style);
+        }
+
+        public static Storyboard Play(FrameworkElement target, TransitionStyle style, Action completedAction = null)
+        {
+            Storyboard storyboard = null;
+            switch (style)
+            {
+                case TransitionStyle.None:
+                    break;
+                case TransitionStyle.Slide:
+                    storyboard = CreateSlideStoryboard();
+                    break;
+                case TransitionStyle.VerticalSlide:
+                    storyboard = CreateVerticalSlideStoryboard();
+                    break;
+                case TransitionStyle.SlideOut:
+                    storyboard = CreateSlideStoryboard(false);
+                    break;
+                case TransitionStyle.VerticalSlideOut:
+                    storyboard = CreateVerticalSlideStoryboard(false);
+                    break;
+                default:
+                    break;
+            }
+            if (completedAction != null)
+                storyboard.Completed += (x, y) =&gt; completedAction();
+            storyboard.Begin(target);
+            return storyboard;
+        }
+
+        private static Storyboard CreateSlideStoryboard(bool isFadeIn = true)
+        {
+            var storyboard = new Storyboard();
+
+            var fromThickness = isFadeIn ? new Thickness(30, 0, -30, 0) : new Thickness(0);
+            var toThickness = isFadeIn ? new Thickness(0) : new Thickness(30, 0, -30, 0);
+
+            var slideAnimation = new ThicknessAnimation();
+            slideAnimation.From = fromThickness;
+            slideAnimation.To = toThickness;
+            slideAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.3));
+
+            Storyboard.SetTargetProperty(slideAnimation, new PropertyPath(FrameworkElement.MarginProperty));
+            storyboard.Children.Add(slideAnimation);
+
+            var fromOpacity = isFadeIn ? 0 : 1;
+            var toOpacity = isFadeIn ? 1 : 0;
+
+            var opacityAnimation = new DoubleAnimation();
+            opacityAnimation.From = fromOpacity;
+            opacityAnimation.To = toOpacity;
+            opacityAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.5));
+            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(FrameworkElement.OpacityProperty));
+            storyboard.Children.Add(opacityAnimation);
+
+            return storyboard;
+        }
+
+        private static Storyboard CreateVerticalSlideStoryboard(bool isFadeIn = true)
+        {
+            var storyboard = new Storyboard();
+
+            var fromThickness = isFadeIn ? new Thickness(0, 30, 0, -30) : new Thickness(0);
+            var toThickness = isFadeIn ? new Thickness(0) : new Thickness(0, 30, 0, -30);
+
+
+            var slideAnimation = new ThicknessAnimation();
+            slideAnimation.From = fromThickness;
+            slideAnimation.To = toThickness;
+            slideAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.3));
+
+            Storyboard.SetTargetProperty(slideAnimation, new PropertyPath(FrameworkElement.MarginProperty));
+            storyboard.Children.Add(slideAnimation);
+
+            var fromOpacity = isFadeIn ? 0 : 1;
+            var toOpacity = isFadeIn ? 1 : 0;
+
+            var opacityAnimation = new DoubleAnimation();
+            opacityAnimation.From = fromOpacity;
+            opacityAnimation.To = toOpacity;
+            opacityAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.5));
+            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(FrameworkElement.OpacityProperty));
+            storyboard.Children.Add(opacityAnimation);
+
+            return storyboard;
+        }
+
+    }
+</code></pre>
+
+<p>Xaml上で設定すれば、コンテンツの読み込み時に自動でアニメーションをするようになります。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-05.png" alt="wpf-08-05" /></p>
+
+<p>また静的メソッドを利用して、任意のタイミングでも動作します。</p>
+
+<h2>まとめ</h2>
+
+<p>ユーザーコントロールで作成したストアアプリスタイルの設定画面を設け、スタイルの変更ができるようになりました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-06.png" alt="wpf-08-06" /></p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-07.png" alt="wpf-08-07" /></p>
+
+<p>ただし、設定したユーザー固有のスタイルはまだ永続化していません。<br/>
+また、TabControlを利用していますが、このコンテンツはどうしても旧来のWindows Formを彷彿させる、モダンではないビシュアルです。</p>
+
+<p>次回の宿題は、ユーザー固有のスタイルは <a href="http://msdn.microsoft.com/ja-jp/library/system.io.isolatedstorage.aspx">IsolatedStorage</a> の機能を利用して永続化したいと思います。
+それと、Controlから派生したItemsControlを利用して、モダンなカスタム コントロールを作成したいと思います。</p>
+
+<p>サンプル成果物はGit管理で。</p>
+
+<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Windowに学ぶテンプレートと添付プロパティ - WPF Vol 06]]></title>
@@ -1019,7 +1302,7 @@ TextBoxに値を入力しそれが例外なくSampleDateに転送できた場合
 <p>WPFは自由度が高い反面、ルールがないと意図しない結果になる可能性があります。
 たとえばですが、開発者はXaml上でコンボボックスを正しくコーディングしていたとしても、テンプレートというスタイルを書き換える機能が適用された場合は、それがラジオボタンに差し替わって表示されることなど容易に可能です。</p>
 
-<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.validationrules.aspx">MSDNのこの記事</a>など読むと面白いのですが</p>
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms752339.aspx">MSDNのこの記事</a>など読むと面白いのですが</p>
 
 <blockquote><p>このベスト プラクティスは、組み込みの WPF コントロール セット用のテーマ コントロール スタイルでの作業の際に、多くの試行錯誤を通じて得られたものです。</p></blockquote>
 
@@ -1084,148 +1367,6 @@ public class ComboBox : Selector
 <p>以上で、バインディングの基本でありながら、WPFの肝要となる機能の紹介でした。</p>
 
 <p>これらの動作を確認するためのサンプルは<a href="http://s-ueno.github.io/additionalData/uEN-Vol03.zip">コチラ</a></p>
-
-<hr />
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 02 - ルーティング イベント]]></title>
-    <link href="http://s-ueno.github.io/blog/2014/10/01/wpf-02/"/>
-    <updated>2014-10-01T14:00:00+09:00</updated>
-    <id>http://s-ueno.github.io/blog/2014/10/01/wpf-02</id>
-    <content type="html"><![CDATA[<p>最初に簡単に<a href="http://msdn.microsoft.com/ja-jp/library/ms247121.aspx">ItemTemplates</a>について紹介して、<a href="http://msdn.microsoft.com/ja-jp/library/ms742806.aspx">ルーティング イベント</a>とビューモデルの紐付おまじないコードの解決を図りたいと思います。</p>
-
-<!-- more -->
-
-
-<p>たとえばVisualStudio2013をインストールすると、
-C:\Users\&ldquo;username&rdquo;\Documents\Visual Studio 2013\Templates\
-というフォルダができていると思います。</p>
-
-<p>ここに以下の作業を実施します。</p>
-
-<ul>
-<li>【ItemTemplates】フォルダ - 【Visual C#】フォルダの中に新規フォルダ作成（uEN Laboratory）</li>
-<li>この<a href="http://s-ueno.github.io/additionalData/BizViewModel.zip">ZIPファイル</a>を先ほどのフォルダに入れる</li>
-</ul>
-
-
-<p>そうすると、クラスの新規追加時に雛形を提供することができます。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-02-01.png" alt="wpf-02-01" /></p>
-
-<p>ViewクラスとVeiwModelクラスがセットで追加されます。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-02-02.png" alt="wpf-02-02" /></p>
-
-<p>名前空間などはテンプレートがサポートします。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-02-03.png" alt="wpf-02-03" />
-<img src="http://s-ueno.github.io/images/wpf-02-04.png" alt="wpf-02-04" /></p>
-
-<p>前回はベースクラス名を変えたり、Xamlに名前空間をインポートしたりとかなり手間だったのですが、この機能を利用すると毎回同じ作業を実施しなくて済むようになります。
-WPFでの開発生産性を上げる上ではとても有効なので、ぜひ利用してみてください。</p>
-
-<p>カスタマイズするには、さっきのZIPファイルやMSDNを参考にすると簡単にできるのでチェックしてみてください。</p>
-
-<h2>ルーティング イベント</h2>
-
-<p>ボタン押下などのイベント処理を簡単に実装するためには、またおまじないコードが必要になります。<br/>
-<a href="http://ja.wikipedia.org/wiki/Model_View_ViewModel">Model-View-ViewModel</a> デザイン パターンを利用しない場合は、Xaml（ザムル）上でダブルクリックすると、Xaml.CSファイルのコードビハインドにクリックイベントが紐付けられます。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-02-05.png" alt="wpf-02-05" />
-<img src="http://s-ueno.github.io/images/wpf-02-06.png" alt="wpf-02-06" /></p>
-
-<p>ただ、これでは画面をXamlで作成するという難易度だけ上がって、Windows Formとあまり変わりません。
-そこで、このイベント処理もバインディングできればと思います。</p>
-
-<p>上記の実装ですが、明示的にRoutedEventを利用してコードビハインド上で記述することもできます。</p>
-
-<pre><code>    SampleButton.AddHandler(Button.ClickEvent, new RoutedEventHandler(SampleButton_Click));
-</code></pre>
-
-<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.buttonbase.clickevent.aspx">Button.ClickEvent</a> は　Buttonクラスに静的に定義され、開発者が利用できるように提供されています。</p>
-
-<p>この仕組みを利用することで、指定したオブジェクトが指定したRoutedEventを実行する際の処理をどこか別の場所（具体的にはViewModel）に定義することができるようになります。</p>
-
-<p><a href="http://ja.wikipedia.org/wiki/Proxy_%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Proxyパターン</a>を利用したラッパー経由でViewModelのメソッドに割り付けるようなクラスを準備すれば十分ではないでしょうか。
-前回、バインドをタイプセーフに行うためにラムダ式でプロパティ名を指定したように、このイベントの紐付けもラムダ式で行うようにしたいと思います。</p>
-
-<pre><code>    public class RoutedEventBehavior
-    {
-        public RoutedEvent RoutedEvent { get; set; }
-        public object ViewModel { get; set; }
-        public DependencyObject Element { get; set; }
-        public LambdaExpression LambdaExpression { get; set; }
-        protected Action Method { get; set; }
-        protected Action&lt;RoutedEventArgs&gt; ArgsMethod { get; set; }
-        public virtual void Ensure()
-        {
-            var uiElement = Element as UIElement;
-            if (uiElement == null)
-                return;
-
-            if (Method == null &amp;&amp; ArgsMethod == null)
-            {
-                var compile = LambdaExpression.Compile().DynamicInvoke(ViewModel);
-                Method = compile as Action;
-                ArgsMethod = compile as Action&lt;RoutedEventArgs&gt;;
-            }
-            uiElement.AddHandler(RoutedEvent, new RoutedEventHandler(OnEventInternal));
-        }
-        protected virtual void OnEventInternal(object sender, RoutedEventArgs e)
-        {
-            var currentCursor = Mouse.OverrideCursor;
-            Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
-            try
-            {
-                if (Method != null)
-                    Method.Invoke();
-
-                if (ArgsMethod != null)
-                    ArgsMethod.Invoke(e);
-            }
-            catch (Exception)
-            {
-                //エラー時のアプリケーション ポリシー
-                throw;
-            }
-            finally
-            {
-                Mouse.OverrideCursor = currentCursor;
-            }
-        }
-    }
-</code></pre>
-
-<p>サンプル程度の実装ですが、こうすることで、ボタン押下時のマウスカーソルの自動Wait化やエラー時のロギングなどを開発者が実装する必要がなくなります。
-ログ出力には、<a href="http://msdn.microsoft.com/ja-jp/library/System.Diagnostics.TraceSource.aspx">TraceSource</a>クラスを利用すると便利なので、別の機会に紹介します。</p>
-
-<p>また、開発者が直接このようなクラスを生成する手間は省きたいです。<br/>
-たとえば<a href="https://www.google.com/search?q=Expression+Builder%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3">Expression Builderパターン</a>なんてプログラミング デザイン パターンを採用してみれば、開発がしやすく可読性があがるかもしれません。</p>
-
-<p>画面上にテキストボックス、ボタンが配置されている場合のコーディング イメージとしてはこのような形でしょうか？</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-02-07.png" alt="wpf-02-07" /></p>
-
-<p>コントロールを指定して、依存関係プロパティないしルーティング イベントとViewModelのメソッドをタイプセーフに紐付けるビルダーを利用してバインドするという形です。</p>
-
-<p>このコードを記述して実際に動かすとこのようになります。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-02-08.png" alt="wpf-02-08" /></p>
-
-<p>テキストボックスに文字を入力し、ボタンをクリックするとViewModel上のSampleActionメソッドが呼び出され、バインドしているSampleTextプロパティから文字を取得してメッセージ表示しています。</p>
-
-<p>ツールレベルならコレでも十分かもしれませんが、実際のLOB開発時には画面に表示する際に変換（<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.ivalueconverter.aspx">IValueConverter</a>）する、入力制限する、他にも様々な作業が発生するので、次回は少しこのバインディングについて掘り下げていきたいと思います。</p>
-
-<p>余談ですが、Buttonクラスは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.buttonbase.command.aspx">Command</a>というプロパティを提供しています。<br/>
-こちらを利用することでもボタンのクリックイベント処理を実装することができるのですが、この仕組みはLOBアプリのとあるボタンの押下処理とは意味合いが少し異なることを<a href="http://msdn.microsoft.com/ja-jp/library/ms752308.aspx">目的</a>にしています。</p>
-
-<p>LOBアプリでのイベント処理はルーティング イベントを利用するほうがシンプルです。
-コマンドについては別の機会で紹介できればと思います。</p>
-
-<p>今回のサンプルは<a href="http://s-ueno.github.io/additionalData/uEN-Vol02.zip">コチラ</a></p>
 
 <hr />
 ]]></content>

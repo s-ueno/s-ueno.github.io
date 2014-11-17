@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-15T09:30:31+09:00</updated>
+  <updated>2014-11-17T19:54:33+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,462 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ユーザーコントロールに学ぶ様々なコンテンツ - WPF Vol 07]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/17/wpf-08/"/>
+    <updated>2014-11-17T19:44:57+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/17/wpf-08</id>
+    <content type="html"><![CDATA[<p>設定メニューの作成を通じて、ユーザーコントロールについて紹介します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-01.png" alt="wpf-08-01" /></p>
+
+<!-- more -->
+
+
+<p>WPFは柔軟で StyleやTemplate、添付プロパティで多くは対応できるのですが、場合によっては以下のようなレベルでコントロールを作成する場面も出てきます。</p>
+
+<ul>
+<li>ユーザーコントロール</li>
+<li>カスタムコントロール</li>
+<li>カスタム要素</li>
+</ul>
+
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms745025.aspx">MSDNにも記載</a>があります。</p>
+
+<p>また、これらをクラス ライブラリとして開発する場合と、アプリケーションとして開発する場合で適用するプログラミング デザインパターンも変わってきます。</p>
+
+<p>本シリーズのビューの基本クラスとなるBizViewクラスはUserControl派生です。
+その基本機能を実装する上でMVVMパターンで作成しているかといえば、クラスライブラリとしての基本セットなのでそうではありません。</p>
+
+<h2>ユーザーコントロール</h2>
+
+<p>VisualStudioで、新しい項目を追加する場合に選択できます。<br/>
+ベースクラスがUserControlクラスになります。</p>
+
+<p>主な目的は、より要件に具体的なビューを提供済みのコンテンツを組み合わせて構築することです。<br/>
+たとえば、BizViewクラスから派生したView/ViewModelの各種コンテンツ(サンプルのVol04View/Vol05Viewなど)も同様に、目的とする画面をボタンやラベルといった提供済みコンテンツを配置して作成しています。</p>
+
+<p>それと比べて、カスタムコントロールやカスタム要素は、WPFの組込済みコントロール(Buttonのベースクラスは)がそうであるように、基本となるコンテンツ作成として利用します。</p>
+
+<p>FrameworkElement派生ではパフォーマンスが向上しますが、実装する際には <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.media.drawingvisual.aspx">DrawingVisual</a> クラスなどを利用して、描画を実装する必要が出てきます。</p>
+
+<p>さて、今回は画面の右側に表示する設定画面をユーザーコントロールで作成します。<br/>
+画面は以下の構成で、コンテンツ部には指定したView/ViewModelのセットが追加できるよう検討します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-03.png" alt="wpf-08-03" /></p>
+
+<p>ユーザーコントロールなので、Xamlで画面を開発する要領で作成します。</p>
+
+<p>Xamlも上から下まで30行程度です。</p>
+
+<ul>
+<li>グリッドをデザイン通りに上下分割</li>
+<li>上部にタイトルとアイコン</li>
+<li>下部に設定タイトル一覧とメインコンテンツ</li>
+</ul>
+
+
+<p>を配置しています。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;UserControl x:Class="uEN.UI.Controls.Settings"
+</span><span class='line'>             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+</span><span class='line'>             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+</span><span class='line'>             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+</span><span class='line'>             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+</span><span class='line'>             xmlns:uen="clr-namespace:uEN.UI"
+</span><span class='line'>             mc:Ignorable="d" 
+</span><span class='line'>             Background="{DynamicResource AppBrand}"
+</span><span class='line'>             Foreground="White"
+</span><span class='line'>             BorderBrush="Transparent"
+</span><span class='line'>             d:DesignHeight="300" d:DesignWidth="300"&gt;
+</span><span class='line'>    &lt;UserControl.Resources&gt;
+</span><span class='line'>        &lt;uen:ViewDataTemplateSelector x:Key="templateSelector" /&gt;
+</span><span class='line'>    &lt;/UserControl.Resources&gt;
+</span><span class='line'>    &lt;Grid&gt;
+</span><span class='line'>        &lt;Grid.RowDefinitions&gt;
+</span><span class='line'>            &lt;RowDefinition Height="auto"/&gt;
+</span><span class='line'>            &lt;RowDefinition Height="*"/&gt;
+</span><span class='line'>        &lt;/Grid.RowDefinitions&gt;
+</span><span class='line'>        &lt;StackPanel Margin="10,30,0,30" Orientation="Horizontal"&gt;
+</span><span class='line'>            &lt;Button x:Name="IconButton" Width="35" Height="35" Margin="5" 
+</span><span class='line'>                    Foreground="White"
+</span><span class='line'>                    BorderBrush="White"
+</span><span class='line'>                    Style="{DynamicResource EllipseButtonStyle}" 
+</span><span class='line'>                    &gt;
+</span><span class='line'>                &lt;Viewbox Stretch="Fill"&gt;
+</span><span class='line'>                    &lt;Path Style="{DynamicResource PathButtonStyle}"
+</span><span class='line'>                          Data="F1 M 33.6458,38L 49.4792,53.8333L 38.7917,53.8333L 22.1667,38L 38.7917,22.1667L 49.4792,22.1667L 33.6458,38 Z "/&gt;
+</span><span class='line'>                &lt;/Viewbox&gt;
+</span><span class='line'>            &lt;/Button&gt;
+</span><span class='line'>            &lt;TextBlock x:Name="Caption" Text="Settings" FontSize="20" VerticalAlignment="Center"/&gt;
+</span><span class='line'>        &lt;/StackPanel&gt;
+</span><span class='line'>        &lt;ListBox Grid.Row="1" x:Name="SettingViewModels" Visibility="Visible" /&gt;
+</span><span class='line'>        &lt;ContentPresenter Grid.Row="1" x:Name="ViewModelPresenter"  
+</span><span class='line'>                          ContentTemplateSelector="{StaticResource templateSelector}"
+</span><span class='line'>                          /&gt;
+</span><span class='line'>    &lt;/Grid&gt;
+</span><span class='line'>&lt;/UserControl&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>アイコンのジオメトリも前回同様に<a href="http://modernuiicons.com/">Alex Peattie</a>さんのものを利用しています。</p>
+
+<p>ボタンは丸く描画されるように <code>Style="{DynamicResource EllipseButtonStyle}"</code> としてスタイルをリソースとして切り出し、コンテンツにジオメトリを設定しています。</p>
+
+<p>切り出したスタイルは単に  <code>&lt;Setter Property="Template"&gt;</code> としてControlTemplateを設定する際に、Mindwos 8 Styleではフラットで角なしの線を描画するために <code>&lt;Border&gt;</code> としましたが、これを <code>&lt;Ellipse&gt;</code> として丸にすればそれだけでOKです。</p>
+
+<p>ボタンを押したときの内部動作はコードビハインド上で記述しています。<br/>
+(クラス ライブラリとしての開発)</p>
+
+<p>アプリケーション構成ファイルに任意のViewModelを設定すると、それが設定画面の一覧に表示されるようにしました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-04.png" alt="wpf-08-04" /></p>
+
+<p>あとは、これをWindow Style で定義しているグリッド上にコンテンツとして配置するだけです。</p>
+
+<h2>アニメーション</h2>
+
+<p>ボタンを押下する度に先ほど作成したユーザーコントロールがWindowとしてモーダル表示されたり、画面上にパッとでたり消えたりするのは、利用者としては新鮮さにかけます。
+XAMLで作成するアプリケーションのゴールは、やはり柔軟なアニメーションを利用者に体験してもらうことにあります。</p>
+
+<p>今回は、そんなアニメーションを添付プロパティとして切り出して実装しています。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>  public enum TransitionStyle
+</span><span class='line'>    {
+</span><span class='line'>        None,
+</span><span class='line'>
+</span><span class='line'>        Slide,
+</span><span class='line'>        VerticalSlide,
+</span><span class='line'>
+</span><span class='line'>        SlideOut,
+</span><span class='line'>        VerticalSlideOut,
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    public class ViewTransition
+</span><span class='line'>    {
+</span><span class='line'>        public static TransitionStyle GetTransitionStyle(DependencyObject obj)
+</span><span class='line'>        {
+</span><span class='line'>            return (TransitionStyle)obj.GetValue(TransitionStyleProperty);
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        public static void SetTransitionStyle(DependencyObject obj, TransitionStyle value)
+</span><span class='line'>        {
+</span><span class='line'>            obj.SetValue(TransitionStyleProperty, value);
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        // Using a DependencyProperty as the backing store for TransitionStyle.  This enables animation, styling, binding, etc...
+</span><span class='line'>        public static readonly DependencyProperty TransitionStyleProperty =
+</span><span class='line'>            DependencyProperty.RegisterAttached("TransitionStyle", typeof(TransitionStyle), typeof(ViewTransition), new UIPropertyMetadata(TransitionStyle.None, OnTransitionStyleChanged));
+</span><span class='line'>
+</span><span class='line'>        private static void OnTransitionStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+</span><span class='line'>        {
+</span><span class='line'>            var fw = d as FrameworkElement;
+</span><span class='line'>            var style = e.NewValue as TransitionStyle?;
+</span><span class='line'>            if (!style.HasValue || style == TransitionStyle.None)
+</span><span class='line'>                return;
+</span><span class='line'>
+</span><span class='line'>            fw.Loaded -= fw_Loaded;
+</span><span class='line'>            fw.Loaded += fw_Loaded;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        static void fw_Loaded(object sender, RoutedEventArgs e)
+</span><span class='line'>        {
+</span><span class='line'>            var fw = (FrameworkElement)sender;
+</span><span class='line'>            var style = GetTransitionStyle(fw);
+</span><span class='line'>
+</span><span class='line'>            Play(fw, style);
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        public static Storyboard Play(FrameworkElement target, TransitionStyle style, Action completedAction = null)
+</span><span class='line'>        {
+</span><span class='line'>            Storyboard storyboard = null;
+</span><span class='line'>            switch (style)
+</span><span class='line'>            {
+</span><span class='line'>                case TransitionStyle.None:
+</span><span class='line'>                    break;
+</span><span class='line'>                case TransitionStyle.Slide:
+</span><span class='line'>                    storyboard = CreateSlideStoryboard();
+</span><span class='line'>                    break;
+</span><span class='line'>                case TransitionStyle.VerticalSlide:
+</span><span class='line'>                    storyboard = CreateVerticalSlideStoryboard();
+</span><span class='line'>                    break;
+</span><span class='line'>                case TransitionStyle.SlideOut:
+</span><span class='line'>                    storyboard = CreateSlideStoryboard(false);
+</span><span class='line'>                    break;
+</span><span class='line'>                case TransitionStyle.VerticalSlideOut:
+</span><span class='line'>                    storyboard = CreateVerticalSlideStoryboard(false);
+</span><span class='line'>                    break;
+</span><span class='line'>                default:
+</span><span class='line'>                    break;
+</span><span class='line'>            }
+</span><span class='line'>            if (completedAction != null)
+</span><span class='line'>                storyboard.Completed += (x, y) =&gt; completedAction();
+</span><span class='line'>            storyboard.Begin(target);
+</span><span class='line'>            return storyboard;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        private static Storyboard CreateSlideStoryboard(bool isFadeIn = true)
+</span><span class='line'>        {
+</span><span class='line'>            var storyboard = new Storyboard();
+</span><span class='line'>
+</span><span class='line'>            var fromThickness = isFadeIn ? new Thickness(30, 0, -30, 0) : new Thickness(0);
+</span><span class='line'>            var toThickness = isFadeIn ? new Thickness(0) : new Thickness(30, 0, -30, 0);
+</span><span class='line'>
+</span><span class='line'>            var slideAnimation = new ThicknessAnimation();
+</span><span class='line'>            slideAnimation.From = fromThickness;
+</span><span class='line'>            slideAnimation.To = toThickness;
+</span><span class='line'>            slideAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.3));
+</span><span class='line'>
+</span><span class='line'>            Storyboard.SetTargetProperty(slideAnimation, new PropertyPath(FrameworkElement.MarginProperty));
+</span><span class='line'>            storyboard.Children.Add(slideAnimation);
+</span><span class='line'>
+</span><span class='line'>            var fromOpacity = isFadeIn ? 0 : 1;
+</span><span class='line'>            var toOpacity = isFadeIn ? 1 : 0;
+</span><span class='line'>
+</span><span class='line'>            var opacityAnimation = new DoubleAnimation();
+</span><span class='line'>            opacityAnimation.From = fromOpacity;
+</span><span class='line'>            opacityAnimation.To = toOpacity;
+</span><span class='line'>            opacityAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.5));
+</span><span class='line'>            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(FrameworkElement.OpacityProperty));
+</span><span class='line'>            storyboard.Children.Add(opacityAnimation);
+</span><span class='line'>
+</span><span class='line'>            return storyboard;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        private static Storyboard CreateVerticalSlideStoryboard(bool isFadeIn = true)
+</span><span class='line'>        {
+</span><span class='line'>            var storyboard = new Storyboard();
+</span><span class='line'>
+</span><span class='line'>            var fromThickness = isFadeIn ? new Thickness(0, 30, 0, -30) : new Thickness(0);
+</span><span class='line'>            var toThickness = isFadeIn ? new Thickness(0) : new Thickness(0, 30, 0, -30);
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>            var slideAnimation = new ThicknessAnimation();
+</span><span class='line'>            slideAnimation.From = fromThickness;
+</span><span class='line'>            slideAnimation.To = toThickness;
+</span><span class='line'>            slideAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.3));
+</span><span class='line'>
+</span><span class='line'>            Storyboard.SetTargetProperty(slideAnimation, new PropertyPath(FrameworkElement.MarginProperty));
+</span><span class='line'>            storyboard.Children.Add(slideAnimation);
+</span><span class='line'>
+</span><span class='line'>            var fromOpacity = isFadeIn ? 0 : 1;
+</span><span class='line'>            var toOpacity = isFadeIn ? 1 : 0;
+</span><span class='line'>
+</span><span class='line'>            var opacityAnimation = new DoubleAnimation();
+</span><span class='line'>            opacityAnimation.From = fromOpacity;
+</span><span class='line'>            opacityAnimation.To = toOpacity;
+</span><span class='line'>            opacityAnimation.Duration = new Duration(TimeSpan.FromSeconds(0.5));
+</span><span class='line'>            Storyboard.SetTargetProperty(opacityAnimation, new PropertyPath(FrameworkElement.OpacityProperty));
+</span><span class='line'>            storyboard.Children.Add(opacityAnimation);
+</span><span class='line'>
+</span><span class='line'>            return storyboard;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>    }
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Xaml上で設定すれば、コンテンツの読み込み時に自動でアニメーションをするようになります。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-05.png" alt="wpf-08-05" /></p>
+
+<p>また静的メソッドを利用して、任意のタイミングでも動作します。</p>
+
+<h2>まとめ</h2>
+
+<p>ユーザーコントロールで作成したストアアプリスタイルの設定画面を設け、スタイルの変更ができるようになりました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-06.png" alt="wpf-08-06" /></p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-08-07.png" alt="wpf-08-07" /></p>
+
+<p>ただし、設定したユーザー固有のスタイルはまだ永続化していません。<br/>
+また、TabControlを利用していますが、このコンテンツはどうしても旧来のWindows Formを彷彿させる、モダンではないビシュアルです。</p>
+
+<p>次回の宿題は、ユーザー固有のスタイルは <a href="http://msdn.microsoft.com/ja-jp/library/system.io.isolatedstorage.aspx">IsolatedStorage</a> の機能を利用して永続化したいと思います。
+それと、Controlから派生したItemsControlを利用して、モダンなカスタム コントロールを作成したいと思います。</p>
+
+<p>サンプル成果物はGit管理で。</p>
+
+<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Windowに学ぶテンプレートと添付プロパティ - WPF Vol 06]]></title>
@@ -1634,7 +2090,7 @@ TextBoxに値を入力しそれが例外なくSampleDateに転送できた場合
 <p>WPFは自由度が高い反面、ルールがないと意図しない結果になる可能性があります。
 たとえばですが、開発者はXaml上でコンボボックスを正しくコーディングしていたとしても、テンプレートというスタイルを書き換える機能が適用された場合は、それがラジオボタンに差し替わって表示されることなど容易に可能です。</p>
 
-<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.validationrules.aspx">MSDNのこの記事</a>など読むと面白いのですが</p>
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms752339.aspx">MSDNのこの記事</a>など読むと面白いのですが</p>
 
 <blockquote><p>このベスト プラクティスは、組み込みの WPF コントロール セット用のテーマ コントロール スタイルでの作業の際に、多くの試行錯誤を通じて得られたものです。</p></blockquote>
 
