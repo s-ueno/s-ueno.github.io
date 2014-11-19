@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-17T19:54:33+09:00</updated>
+  <updated>2014-11-20T02:02:31+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,342 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[カスタムコントロールとおまけでIsolatedStorage - WPF Vol 08]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/20/wpf-09/"/>
+    <updated>2014-11-20T02:02:02+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/20/wpf-09</id>
+    <content type="html"><![CDATA[<p>カスタム コントロールを作成して TabControlと置き換えてみました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-01.png" alt="wpf-09-01" /></p>
+
+<!-- more -->
+
+
+<p>前回はユーザーコントロールでしたが、今度はカスタムコントロールです。</p>
+
+<p>VisualStudioで新しい項目の追加を選択すると</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-02.png" alt="wpf-09-02" /></p>
+
+<p>ユーザーコントロールとは別にカスタムコントロールが選べます。</p>
+
+<p>ユーザーコントロールでは、Xamlファイル+コードビハインドが追加されました。
+カスタムコントロールでは、csファイルがメインで、そのStyleリソースがプロジェクト直下にThemesフォルダとGeneric.xamlという形で追加されます。</p>
+
+<p>TabControlの代わりにListContentカスタムコントロールを作成します。<br/>
+追加されたGeneric.xamlはListContent.Xamlに名前を変更しました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-03.png" alt="wpf-09-03" /></p>
+
+<p>csファイルの中身は、静的コンストラクタとデフォルトスタイル キーの宣言、長いコメントが付いてきます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-04.png" alt="wpf-09-04" /></p>
+
+<p>ベースクラスはControlクラスから<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.selector.aspx">Selector</a> クラスに変更しました。</p>
+
+<p>Controlクラスから複数のアイテムを操作するための一連の機能を実装しているItemsControl、さらにそこに選択するという一連の依存関係プロパティを実装しているSelectorクラスを、今回のベースクラスとして採用しています。</p>
+
+<p>Tabコントロールと同等レベルでよければ、このcsファイルは何も実装しなくても問題ありません。
+追加されたリソースディクショナリにXamlでStyleとTemplateを実装していくと、それだけで問題なく動作できます。</p>
+
+<p>ちなみに、これを利用するアプリケーション側は1行、TabControlからListContentに書き換えるだけです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-05.png" alt="wpf-09-05" /></p>
+
+<p>あとは、デザインをイメージしてXamlのスタイルを記述していきます。<br/>
+今回は上部に各タブのタイトルが並び、それを選択するとメインコンテンツに対象のViewが表示される形です。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ui:ViewDataTemplateSelector x:Key="templateSelector" /&gt;
+</span><span class='line'>&lt;Style TargetType="{x:Type local:ListContent}"&gt;
+</span><span class='line'>    &lt;Setter Property="Focusable" Value="False" /&gt;
+</span><span class='line'>    &lt;Setter Property="FocusVisualStyle" Value="{x:Null}"/&gt;
+</span><span class='line'>    &lt;Setter Property="KeyboardNavigation.TabNavigation" Value="Local" /&gt;
+</span><span class='line'>    &lt;Setter Property="Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate TargetType="{x:Type local:ListContent}"&gt;
+</span><span class='line'>                &lt;Grid&gt;
+</span><span class='line'>                    &lt;Grid.RowDefinitions&gt;
+</span><span class='line'>                        &lt;RowDefinition Height="auto" /&gt;
+</span><span class='line'>                        &lt;RowDefinition Height="*" /&gt;
+</span><span class='line'>                    &lt;/Grid.RowDefinitions&gt;
+</span><span class='line'>                    &lt;ListBox x:Name="TitleContent" 
+</span><span class='line'>                             Background="Transparent"
+</span><span class='line'>                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+</span><span class='line'>                             ItemsSource="{TemplateBinding ItemsSource}"
+</span><span class='line'>                             ItemContainerStyle="{StaticResource ListContentHeaderStyle}"
+</span><span class='line'>                             &gt;
+</span><span class='line'>                        &lt;ListBox.ItemsPanel&gt;
+</span><span class='line'>                            &lt;ItemsPanelTemplate&gt;
+</span><span class='line'>                                &lt;WrapPanel Orientation="Horizontal"/&gt;
+</span><span class='line'>                            &lt;/ItemsPanelTemplate&gt;
+</span><span class='line'>                        &lt;/ListBox.ItemsPanel&gt;
+</span><span class='line'>                    &lt;/ListBox&gt;
+</span><span class='line'>                    &lt;ContentPresenter x:Name="MainContent" Grid.Row="1" 
+</span><span class='line'>                                      Content="{TemplateBinding SelectedItem}"
+</span><span class='line'>                                      ContentTemplateSelector="{StaticResource templateSelector}" /&gt;
+</span><span class='line'>                &lt;/Grid&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ポイントがいくつかあります。</p>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.input.keyboardnavigation.tabnavigation.aspx">KeyboardNavigation.TabNavigation</a> 添付プロパティ</li>
+<li>ListBox</li>
+<li>ContentPresenter</li>
+</ul>
+
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.input.keyboardnavigation.tabnavigation.aspx">KeyboardNavigation.TabNavigation</a> 添付プロパティ</h2>
+
+<p>WPFはツリー構造なのでTabを押下していくと最初にトップレベルのコンテンツにタブが移動してきます。そこで、この添付プロパティ値をLocal設定すると、Tabで今回作成したListContentにフォーカスが入った際に、次のコンテンツではなく、ListContent内部へTabが移動するようになります。</p>
+
+<h2>ListBox / <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.itemcontainerstyle.aspx">ListBox.ItemContainerStyle</a></h2>
+
+<p>今回は上部にヘッダー用のメニューをデザインしています。
+ListContentはベースクラスにItemsControlを持つので、そこにバインドされたコレクションの一覧を持ちます。</p>
+
+<p>その一覧をListBoxのItemsSourceにTemplateBindingで転送しています。
+ListBoxなので、各行のスタイルを自由にデザインできます。
+このスタイルが、上部のメニューのスタイルになります。そのStyleを決定するのが<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.itemcontainerstyle.aspx">ListBox.ItemContainerStyle</a>プロパティです。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ListBox.ItemContainerStyle&gt;
+</span><span class='line'>  &lt;Style TargetType="{x:Type ListBoxItem}"&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>として直接記述することもできますし、<code>&lt;Style  x:Key="ListContentHeaderStyle" TargetType="{x:Type ListBoxItem}"&gt;</code> として別の箇所に記述したものを利用することもできます。</p>
+
+<p>今回は整理するためにも後述の別箇所に切り出しました。</p>
+
+<p>そのStyleも淡々とデザインします。
+アイコンを設定できる枠を用意してもいいし、選択されているときだけ背景色を設定するとかでもいいかもしれません。</p>
+
+<h2>ContentPresenter</h2>
+
+<p>Contentには選択してるアイテムをTemplateBindingで転送しています。<br/>
+その実態はバインド ソースである <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.listcollectionview.aspx">ListCollectionView</a> 経由でViewModelコレクションの中の選択されている一つです。</p>
+
+<p>ContentTemplateSelectorプロパティを利用することで、コンテンツをどう表示させるかを選択させています。</p>
+
+<p>この仕組みだけで表示はできるのですが、コンテンツの細かい一つ一つをどう表示するかを作りこむことで、ユーザーに体感してもらうことができます。</p>
+
+<p>今回はメニューの一つ一つが滑らかなアニメーションで表示されるように作りこみました。<br/>
+些細なことですが、シンプルでも退屈させず、それがコンテンツであることを認識してもらうことができます。</p>
+
+<p>今回はアニメーションの作りこみのために、ListContent.csファイルにコードを追加しています。
+アニメーションは<a href="http://msdn.microsoft.com/ja-jp/library/ms742868.aspx">Storyboard</a> クラス、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.media.animation.animationtimeline.aspx#inheritanceContinued">AnimationTimeline</a> クラスと利用するのですが、滑らかにするためのコツとして<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.media.animation.easingfunctionbase.aspx#inheritanceContinued">イージング関数</a>があります。</p>
+
+<p>機械的な動作ではなく、慣性的なアニメーションで滑らかな印象を与えることができます。</p>
+
+<p>XAMLは技術依存ですが資産としてクラス ライブラリに集めていくと、利用するアプリケーション開発は自動でポリシーのように利用できるようになります。</p>
+
+<p>いくつかの基本的な技術資産を実装した段階で、具体的なアプリケーションの作成を考えています。
+その際にはラフでいい加減なユースケース シナリオを用いたお手軽分析しながら作成したいと思います。</p>
+
+<p>代表的な残りは・・・</p>
+
+<ul>
+<li>ストアアプリ風メッセージボックス</li>
+<li>画面遷移</li>
+<li>例外専用ダイアログ</li>
+<li>TextBox
+
+<ul>
+<li>Modern Style化</li>
+<li>IMEの注入</li>
+<li>型桁対応</li>
+<li>AutoComplete</li>
+</ul>
+</li>
+<li>DataGrid
+
+<ul>
+<li>Modern Style化</li>
+</ul>
+</li>
+<li>ToggleButton系</li>
+<li>ComboBox</li>
+</ul>
+
+
+<p>などでしょうか。</p>
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.io.isolatedstorage.aspx">IsolatedStorage</a></h2>
+
+<p>おまけで、紹介します。</p>
+
+<p>MSDNを見てもよくわかりませんが、簡単に言うとアプリケーション毎のセキュアな読書用Streamを与えてくれる機能です。Streamなので、具体的なファイルパスを意識する必要がないのが便利です。</p>
+
+<p>また、実際に永続化してくれているので、アプリケーションの次回起動時にその情報を利用できます。</p>
+
+<p>今回は拡張メソッドで用意しました。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>    public static class BackingStore
+</span><span class='line'>    {
+</span><span class='line'>        public static void SetBackingStore&lt;T&gt;(this T obj, object value, [CallerMemberName] string key = null) where T : class
+</span><span class='line'>        {
+</span><span class='line'>            var appStore = IsolatedStorageFile.GetUserStoreForAssembly();
+</span><span class='line'>            var directoryPath = typeof(T).FullName;
+</span><span class='line'>            if (!appStore.DirectoryExists(directoryPath))
+</span><span class='line'>            {
+</span><span class='line'>                appStore.CreateDirectory(directoryPath);
+</span><span class='line'>            }
+</span><span class='line'>
+</span><span class='line'>            using (var stream = new IsolatedStorageFileStream(Path.Combine(directoryPath, key), FileMode.OpenOrCreate, appStore))
+</span><span class='line'>            {
+</span><span class='line'>                var formatter = new BinaryFormatter();
+</span><span class='line'>                formatter.Serialize(stream, value);
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>        public static object GetBackingStore&lt;T&gt;(this T obj, [CallerMemberName] string key = null) where T : class
+</span><span class='line'>        {
+</span><span class='line'>            var appStore = IsolatedStorageFile.GetUserStoreForAssembly();
+</span><span class='line'>            var directoryPath = typeof(T).FullName;
+</span><span class='line'>            if (!appStore.DirectoryExists(directoryPath))
+</span><span class='line'>            {
+</span><span class='line'>                appStore.CreateDirectory(directoryPath);
+</span><span class='line'>            }
+</span><span class='line'>
+</span><span class='line'>            object result = null;
+</span><span class='line'>            try
+</span><span class='line'>            {
+</span><span class='line'>                using (var stream = new IsolatedStorageFileStream(Path.Combine(directoryPath, key), FileMode.OpenOrCreate, appStore))
+</span><span class='line'>                {
+</span><span class='line'>                    var formatter = new BinaryFormatter();
+</span><span class='line'>                    result = formatter.Deserialize(stream);
+</span><span class='line'>                }
+</span><span class='line'>            }
+</span><span class='line'>            catch (Exception ex)
+</span><span class='line'>            {
+</span><span class='line'>
+</span><span class='line'>            }
+</span><span class='line'>            return result;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        public static void RemoveBackingStore&lt;T&gt;(this T obj) where T : class
+</span><span class='line'>        {
+</span><span class='line'>            var appStore = IsolatedStorageFile.GetUserStoreForAssembly();
+</span><span class='line'>            appStore.Remove();
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>    }
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>プロパティのバッキングストアのように利用します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>public int MyProperty
+</span><span class='line'>{
+</span><span class='line'>    get { return (int)this.GetBackingStore(); }
+</span><span class='line'>    set { this.SetBackingStore(value); }
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ただ FileIOしますし、排他制御もしていないので、マルチスレッドはもちろん頻繁にアクセスするような機能でないことは確かです。</p>
+
+<p>今回はSettingで選択した情報を保存・復元する機能を持ちます。
+具体的な永続化の場所はユーザーのAppDataフォルダの中に保存されています。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ユーザーコントロールに学ぶ様々なコンテンツ - WPF Vol 07]]></title>

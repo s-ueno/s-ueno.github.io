@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>カスタムコントロールとおまけでIsolatedStorage - WPF Vol 08 - uEN Laboratory</title>
+  <meta name="author" content="uEN">
+
+  <meta name="description" content="ViewModelで簡単にLOB開発できるようなソリューションを目指します。">
+  <meta name="keywords" content="uENLaboratory">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://s-ueno.github.io/blog/2014/11/20/wpf-09">
+  <link href="/favicon.png" type="image/png" rel="icon">
+  <link href="/atom.xml" rel="alternate" title="uEN Laboratory" type="application/atom+xml">
+
+  <!-- http://opengraphprotocol.org/ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="http://s-ueno.github.io/blog/2014/11/20/wpf-09">
+  <meta property="og:title" content="カスタムコントロールとおまけでIsolatedStorage - WPF Vol 08 - uEN Laboratory">
+  <meta property="og:description" content="ViewModelで簡単にLOB開発できるようなソリューションを目指します。">
+
+  <script src="/javascripts/libs/jquery/jquery-2.0.3.min.js"></script>
+
+<link href="/assets/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+<link href="/assets/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css">
+
+<script language="JavaScript">
+$(document).ready( function () {
+   $("a[href^='http']:not([href*='" + location.hostname + "'])").attr('target', '_blank');
+})
+</script>
+
+  
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+  
+   <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-54883059-1', 'auto');
+    ga('send', 'pageview');
+
+  </script>
+
+
+</head>
+
+  <body   >
+    <div id="wrap">
+      <header role="banner">
+        <nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">uEN Laboratory</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a rel="index" href="/">Blog</a>
+                </li>
+                <li >
+                    <a href="/blog/archives">Archives</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="subscribe-rss" href="/atom.xml" title="subscribe via RSS">
+                        <span class="visible-xs">RSS</span>
+                        <img class="hidden-xs" src="/images/rss.png" alt="RSS">
+                    </a>
+                </li>
+                
+            </ul>
+            
+                <form class="search navbar-form navbar-right" action="https://www.google.com/search" method="GET">
+                    <input type="hidden" name="q" value="site:s-ueno.github.io">
+                    <div class="form-group">
+                        <input class="form-control" type="text" name="q" placeholder="Search">
+                    </div>
+                </form>
+            
+        </div>
+    </div>
+</nav>
+
+
+      </header>
+      <div id="main" class="container">
+        <div id="content">
+          <div class="row">
+  <div class="page-content col-md-9" itemscope itemtype="http://schema.org/Blog">
+    <meta itemprop="name" content="uEN Laboratory" />
+    <meta itemprop="description" content="不定期でC#関連の情報を展開します。" />
+    <meta itemprop="url" content="http://s-ueno.github.io" />
+    <article class="hentry" role="article" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+      
+  <header class="page-header">
+    
+      <p class="meta text-muted text-uppercase">
+        
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-11-20T02:02:02+09:00"  data-updated="true" itemprop="datePublished dateCreated"><time class='entry-date' datetime='2014-11-20T02:02:02+09:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:02 am</span></time></time>
+        
+           | <a href="#disqus_thread" itemprop="discussionUrl"
+             data-disqus-identifier="http://s-ueno.github.io">Comments</a>
+        
+      </p>
+    
+    
+    <h1 class="entry-title" itemprop="name headline">
+        カスタムコントロールとおまけでIsolatedStorage - WPF Vol 08
+        
+    </h1>
+    
+  </header>
+
+
+<div class="entry-content clearfix" itemprop="articleBody description"><p>カスタム コントロールを作成して TabControlと置き換えてみました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-01.png" alt="wpf-09-01" /></p>
+
+<!-- more -->
+
+
+<p>前回はユーザーコントロールでしたが、今度はカスタムコントロールです。</p>
+
+<p>VisualStudioで新しい項目の追加を選択すると</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-02.png" alt="wpf-09-02" /></p>
+
+<p>ユーザーコントロールとは別にカスタムコントロールが選べます。</p>
+
+<p>ユーザーコントロールでは、Xamlファイル+コードビハインドが追加されました。
+カスタムコントロールでは、csファイルがメインで、そのStyleリソースがプロジェクト直下にThemesフォルダとGeneric.xamlという形で追加されます。</p>
+
+<p>TabControlの代わりにListContentカスタムコントロールを作成します。<br/>
+追加されたGeneric.xamlはListContent.Xamlに名前を変更しました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-03.png" alt="wpf-09-03" /></p>
+
+<p>csファイルの中身は、静的コンストラクタとデフォルトスタイル キーの宣言、長いコメントが付いてきます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-04.png" alt="wpf-09-04" /></p>
+
+<p>ベースクラスはControlクラスから<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.selector.aspx">Selector</a> クラスに変更しました。</p>
+
+<p>Controlクラスから複数のアイテムを操作するための一連の機能を実装しているItemsControl、さらにそこに選択するという一連の依存関係プロパティを実装しているSelectorクラスを、今回のベースクラスとして採用しています。</p>
+
+<p>Tabコントロールと同等レベルでよければ、このcsファイルは何も実装しなくても問題ありません。
+追加されたリソースディクショナリにXamlでStyleとTemplateを実装していくと、それだけで問題なく動作できます。</p>
+
+<p>ちなみに、これを利用するアプリケーション側は1行、TabControlからListContentに書き換えるだけです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-09-05.png" alt="wpf-09-05" /></p>
+
+<p>あとは、デザインをイメージしてXamlのスタイルを記述していきます。<br/>
+今回は上部に各タブのタイトルが並び、それを選択するとメインコンテンツに対象のViewが表示される形です。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ui:ViewDataTemplateSelector x:Key="templateSelector" /&gt;
+</span><span class='line'>&lt;Style TargetType="{x:Type local:ListContent}"&gt;
+</span><span class='line'>    &lt;Setter Property="Focusable" Value="False" /&gt;
+</span><span class='line'>    &lt;Setter Property="FocusVisualStyle" Value="{x:Null}"/&gt;
+</span><span class='line'>    &lt;Setter Property="KeyboardNavigation.TabNavigation" Value="Local" /&gt;
+</span><span class='line'>    &lt;Setter Property="Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate TargetType="{x:Type local:ListContent}"&gt;
+</span><span class='line'>                &lt;Grid&gt;
+</span><span class='line'>                    &lt;Grid.RowDefinitions&gt;
+</span><span class='line'>                        &lt;RowDefinition Height="auto" /&gt;
+</span><span class='line'>                        &lt;RowDefinition Height="*" /&gt;
+</span><span class='line'>                    &lt;/Grid.RowDefinitions&gt;
+</span><span class='line'>                    &lt;ListBox x:Name="TitleContent" 
+</span><span class='line'>                             Background="Transparent"
+</span><span class='line'>                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+</span><span class='line'>                             ItemsSource="{TemplateBinding ItemsSource}"
+</span><span class='line'>                             ItemContainerStyle="{StaticResource ListContentHeaderStyle}"
+</span><span class='line'>                             &gt;
+</span><span class='line'>                        &lt;ListBox.ItemsPanel&gt;
+</span><span class='line'>                            &lt;ItemsPanelTemplate&gt;
+</span><span class='line'>                                &lt;WrapPanel Orientation="Horizontal"/&gt;
+</span><span class='line'>                            &lt;/ItemsPanelTemplate&gt;
+</span><span class='line'>                        &lt;/ListBox.ItemsPanel&gt;
+</span><span class='line'>                    &lt;/ListBox&gt;
+</span><span class='line'>                    &lt;ContentPresenter x:Name="MainContent" Grid.Row="1" 
+</span><span class='line'>                                      Content="{TemplateBinding SelectedItem}"
+</span><span class='line'>                                      ContentTemplateSelector="{StaticResource templateSelector}" /&gt;
+</span><span class='line'>                &lt;/Grid&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ポイントがいくつかあります。</p>
+
+<ul>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.input.keyboardnavigation.tabnavigation.aspx">KeyboardNavigation.TabNavigation</a> 添付プロパティ</li>
+<li>ListBox</li>
+<li>ContentPresenter</li>
+</ul>
+
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.input.keyboardnavigation.tabnavigation.aspx">KeyboardNavigation.TabNavigation</a> 添付プロパティ</h2>
+
+<p>WPFはツリー構造なのでTabを押下していくと最初にトップレベルのコンテンツにタブが移動してきます。そこで、この添付プロパティ値をLocal設定すると、Tabで今回作成したListContentにフォーカスが入った際に、次のコンテンツではなく、ListContent内部へTabが移動するようになります。</p>
+
+<h2>ListBox / <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.itemcontainerstyle.aspx">ListBox.ItemContainerStyle</a></h2>
+
+<p>今回は上部にヘッダー用のメニューをデザインしています。
+ListContentはベースクラスにItemsControlを持つので、そこにバインドされたコレクションの一覧を持ちます。</p>
+
+<p>その一覧をListBoxのItemsSourceにTemplateBindingで転送しています。
+ListBoxなので、各行のスタイルを自由にデザインできます。
+このスタイルが、上部のメニューのスタイルになります。そのStyleを決定するのが<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.itemcontainerstyle.aspx">ListBox.ItemContainerStyle</a>プロパティです。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ListBox.ItemContainerStyle&gt;
+</span><span class='line'>  &lt;Style TargetType="{x:Type ListBoxItem}"&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>として直接記述することもできますし、<code>&lt;Style  x:Key="ListContentHeaderStyle" TargetType="{x:Type ListBoxItem}"&gt;</code> として別の箇所に記述したものを利用することもできます。</p>
+
+<p>今回は整理するためにも後述の別箇所に切り出しました。</p>
+
+<p>そのStyleも淡々とデザインします。
+アイコンを設定できる枠を用意してもいいし、選択されているときだけ背景色を設定するとかでもいいかもしれません。</p>
+
+<h2>ContentPresenter</h2>
+
+<p>Contentには選択してるアイテムをTemplateBindingで転送しています。<br/>
+その実態はバインド ソースである <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.listcollectionview.aspx">ListCollectionView</a> 経由でViewModelコレクションの中の選択されている一つです。</p>
+
+<p>ContentTemplateSelectorプロパティを利用することで、コンテンツをどう表示させるかを選択させています。</p>
+
+<p>この仕組みだけで表示はできるのですが、コンテンツの細かい一つ一つをどう表示するかを作りこむことで、ユーザーに体感してもらうことができます。</p>
+
+<p>今回はメニューの一つ一つが滑らかなアニメーションで表示されるように作りこみました。<br/>
+些細なことですが、シンプルでも退屈させず、それがコンテンツであることを認識してもらうことができます。</p>
+
+<p>今回はアニメーションの作りこみのために、ListContent.csファイルにコードを追加しています。
+アニメーションは<a href="http://msdn.microsoft.com/ja-jp/library/ms742868.aspx">Storyboard</a> クラス、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.media.animation.animationtimeline.aspx#inheritanceContinued">AnimationTimeline</a> クラスと利用するのですが、滑らかにするためのコツとして<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.media.animation.easingfunctionbase.aspx#inheritanceContinued">イージング関数</a>があります。</p>
+
+<p>機械的な動作ではなく、慣性的なアニメーションで滑らかな印象を与えることができます。</p>
+
+<p>XAMLは技術依存ですが資産としてクラス ライブラリに集めていくと、利用するアプリケーション開発は自動でポリシーのように利用できるようになります。</p>
+
+<p>いくつかの基本的な技術資産を実装した段階で、具体的なアプリケーションの作成を考えています。
+その際にはラフでいい加減なユースケース シナリオを用いたお手軽分析しながら作成したいと思います。</p>
+
+<p>代表的な残りは・・・</p>
+
+<ul>
+<li>ストアアプリ風メッセージボックス</li>
+<li>画面遷移</li>
+<li>例外専用ダイアログ</li>
+<li>TextBox
+
+<ul>
+<li>Modern Style化</li>
+<li>IMEの注入</li>
+<li>型桁対応</li>
+<li>AutoComplete</li>
+</ul>
+</li>
+<li>DataGrid
+
+<ul>
+<li>Modern Style化</li>
+</ul>
+</li>
+<li>ToggleButton系</li>
+<li>ComboBox</li>
+</ul>
+
+
+<p>などでしょうか。</p>
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.io.isolatedstorage.aspx">IsolatedStorage</a></h2>
+
+<p>おまけで、紹介します。</p>
+
+<p>MSDNを見てもよくわかりませんが、簡単に言うとアプリケーション毎のセキュアな読書用Streamを与えてくれる機能です。Streamなので、具体的なファイルパスを意識する必要がないのが便利です。</p>
+
+<p>また、実際に永続化してくれているので、アプリケーションの次回起動時にその情報を利用できます。</p>
+
+<p>今回は拡張メソッドで用意しました。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>    public static class BackingStore
+</span><span class='line'>    {
+</span><span class='line'>        public static void SetBackingStore&lt;T&gt;(this T obj, object value, [CallerMemberName] string key = null) where T : class
+</span><span class='line'>        {
+</span><span class='line'>            var appStore = IsolatedStorageFile.GetUserStoreForAssembly();
+</span><span class='line'>            var directoryPath = typeof(T).FullName;
+</span><span class='line'>            if (!appStore.DirectoryExists(directoryPath))
+</span><span class='line'>            {
+</span><span class='line'>                appStore.CreateDirectory(directoryPath);
+</span><span class='line'>            }
+</span><span class='line'>
+</span><span class='line'>            using (var stream = new IsolatedStorageFileStream(Path.Combine(directoryPath, key), FileMode.OpenOrCreate, appStore))
+</span><span class='line'>            {
+</span><span class='line'>                var formatter = new BinaryFormatter();
+</span><span class='line'>                formatter.Serialize(stream, value);
+</span><span class='line'>            }
+</span><span class='line'>        }
+</span><span class='line'>        public static object GetBackingStore&lt;T&gt;(this T obj, [CallerMemberName] string key = null) where T : class
+</span><span class='line'>        {
+</span><span class='line'>            var appStore = IsolatedStorageFile.GetUserStoreForAssembly();
+</span><span class='line'>            var directoryPath = typeof(T).FullName;
+</span><span class='line'>            if (!appStore.DirectoryExists(directoryPath))
+</span><span class='line'>            {
+</span><span class='line'>                appStore.CreateDirectory(directoryPath);
+</span><span class='line'>            }
+</span><span class='line'>
+</span><span class='line'>            object result = null;
+</span><span class='line'>            try
+</span><span class='line'>            {
+</span><span class='line'>                using (var stream = new IsolatedStorageFileStream(Path.Combine(directoryPath, key), FileMode.OpenOrCreate, appStore))
+</span><span class='line'>                {
+</span><span class='line'>                    var formatter = new BinaryFormatter();
+</span><span class='line'>                    result = formatter.Deserialize(stream);
+</span><span class='line'>                }
+</span><span class='line'>            }
+</span><span class='line'>            catch (Exception ex)
+</span><span class='line'>            {
+</span><span class='line'>
+</span><span class='line'>            }
+</span><span class='line'>            return result;
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        public static void RemoveBackingStore&lt;T&gt;(this T obj) where T : class
+</span><span class='line'>        {
+</span><span class='line'>            var appStore = IsolatedStorageFile.GetUserStoreForAssembly();
+</span><span class='line'>            appStore.Remove();
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>    }
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>プロパティのバッキングストアのように利用します。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>public int MyProperty
+</span><span class='line'>{
+</span><span class='line'>    get { return (int)this.GetBackingStore(); }
+</span><span class='line'>    set { this.SetBackingStore(value); }
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ただ FileIOしますし、排他制御もしていないので、マルチスレッドはもちろん頻繁にアクセスするような機能でないことは確かです。</p>
+
+<p>今回はSettingで選択した情報を保存・復元する機能を持ちます。
+具体的な永続化の場所はユーザーのAppDataフォルダの中に保存されています。</p>
+
+<hr />
+</div>
+
+
+      <footer>
+        <p class="meta text-muted">
+          
+  
+
+<span class="glyphicon glyphicon-user"></span> <span class="byline author vcard" itemprop="author" itemscope itemtype="http://schema.org/Person">Posted by <span class="fn" itemprop="name">uEN</span></span>
+
+          
+
+
+
+
+
+
+
+
+
+
+
+
+<span class="glyphicon glyphicon-calendar"></span> <time datetime="2014-11-20T02:02:02+09:00"  data-updated="true" itemprop="datePublished dateCreated"><time class='entry-date' datetime='2014-11-20T02:02:02+09:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>2:02 am</span></time></time>
+          
+
+<span class="glyphicon glyphicon-tags"></span>&nbsp;
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/wpf/'>wpf</a>
+  
+</span>
+
+
+        </p>
+        
+          <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://s-ueno.github.io/blog/2014/11/20/wpf-09/" data-via="" data-counturl="http://s-ueno.github.io/blog/2014/11/20/wpf-09/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+        
+        
+          <ul class="meta text-muted pager">
+            
+            <li class="previous"><a href="/blog/2014/11/17/wpf-08/" title="Previous Post: ユーザーコントロールに学ぶ様々なコンテンツ - WPF Vol 07">&laquo; ユーザーコントロールに学ぶ様々なコンテンツ - WPF Vol 07</a></li>
+            
+            
+          </ul>
+        
+      </footer>
+    </article>
+    
+      <section>
+        <h1>Comments</h1>
+        <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+      </section>
+    
+  </div>
+
+  
+  <aside class="sidebar col-md-3">
+    
+      
+
+
+
+<section>
+  <p>
+	不定期でC#関連の情報を展開します。
+  
+      <a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub
+  
+  </p>
+</section>
+<section class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recent Posts</h3>
+  </div>
+  
+  <div id="recent_posts" class="list-group">
+    
+    <a class="list-group-item active" href="/blog/2014/11/20/wpf-09/">カスタムコントロールとおまけでIsolatedStorage - WPF Vol 08</a>
+    
+    <a class="list-group-item " href="/blog/2014/11/17/wpf-08/">ユーザーコントロールに学ぶ様々なコンテンツ - WPF Vol 07</a>
+    
+    <a class="list-group-item " href="/blog/2014/11/15/wpf-07/">Windowに学ぶテンプレートと添付プロパティ - WPF Vol 06</a>
+    
+    <a class="list-group-item " href="/blog/2014/11/11/wpf-06/">Buttonに学ぶテンプレートとスタイル - WPF Vol 05</a>
+    
+    <a class="list-group-item " href="/blog/2014/11/11/wpf-05/">What Is the Difference Between Art and Design?</a>
+    
+  </div>
+</section>
+<section>
+  <h3>Category</h3>
+    <ul id="category-list"><li><a href='/blog/categories/wpf/'>wpf (8)</a></li><li><a href='/blog/categories/dezain/'>デザイン (1)</a></li></ul>
+</section>
+<section>
+  <h3>Tags</h3>
+    <span id="tag-cloud"><a href='/blog/tags/binding' style='font-size: 115.0%'>Binding</a> <a href='/blog/tags/itemtemplate' style='font-size: 107.5%'>ItemTemplate</a> <a href='/blog/tags/lobkai-fa' style='font-size: 107.5%'>LOB開発</a> <a href='/blog/tags/mvvm' style='font-size: 107.5%'>MVVM</a> <a href='/blog/tags/routedevent' style='font-size: 107.5%'>RoutedEvent</a> <a href='/blog/tags/style' style='font-size: 115.0%'>Style</a> <a href='/blog/tags/template' style='font-size: 115.0%'>Template</a> <a href='/blog/tags/usercontrol' style='font-size: 107.5%'>UserControl</a> <a href='/blog/tags/wpf' style='font-size: 160.0%'>WPF</a> <a href='/blog/tags/dezain' style='font-size: 107.5%'>デザイン</a> </span>
+</section>
+
+    
+  </aside>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+    <footer role="contentinfo"><div class="container">
+    <p class="text-muted credits">
+  Copyright &copy; 2014 - uEN<br>
+  <small>
+      <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>,
+      <span class="credit">customized with <a href="https://github.com/kAworu/octostrap3">octostrap3</a></span>.
+  </small>
+</p>
+
+</div>
+</footer>
+    
+
+<script type="text/javascript">
+      var disqus_shortname = 'uenlaboratory';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://s-ueno.github.io/blog/2014/11/20/wpf-09/';
+        var disqus_url = 'http://s-ueno.github.io/blog/2014/11/20/wpf-09/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+<script src="/assets/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/javascripts/modernizr-2.0.js"></script>
+
+
+  </body>
+</html>
