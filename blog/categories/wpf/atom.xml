@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Wpf | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-20T02:02:31+09:00</updated>
+  <updated>2014-11-20T20:28:26+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,80 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ダイアログ メッセージのデザイン - WPF Vol 09]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/20/wpf-10/"/>
+    <updated>2014-11-20T20:28:15+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/20/wpf-10</id>
+    <content type="html"><![CDATA[<p>ストア アプリ風のダイアログ メッセージ を作成しました。<br/>
+もちろん、アニメーションします。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-01.png" alt="wpf-10-01" /></p>
+
+<!-- more -->
+
+
+<p>これも、いつもの如くまずはグリッド デザインから始まります。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-02.png" alt="wpf-10-02" /></p>
+
+<p>ちなみに図（と、デザイン）は<a href="http://msdn.microsoft.com/ja-jp/jj984295">ココ</a>です。<br/>
+(XPS で配布しなさいよ!!@心の声)</p>
+
+<p>Windows 8.1 UX ガイドライン というのが、どこかにあると思います。</p>
+
+<p>さて、話を戻すとWindowのデフォルトStyle上で、グリッドを比率設定してデザインしました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-03.png" alt="wpf-10-03" /></p>
+
+<pre><code>&lt;Grid.RowDefinitions&gt;
+    &lt;RowDefinition Height="2*" /&gt;
+    &lt;RowDefinition Height="auto" /&gt;
+    &lt;RowDefinition Height="2*" /&gt;
+&lt;/Grid.RowDefinitions&gt;
+</code></pre>
+
+<p>作業手順ですが、今回のように具体的な図を基にする場合は、Excelにイメージを張り付けた後にセルの数を数えて、6個、3個、6個で比率だと 2対1対2 だね、という大雑把に設定しています。</p>
+
+<p>次に、真ん中のメッセージタイトル、メッセージ内容、ボタンを大まかに区切っていきます。</p>
+
+<pre><code>&lt;Grid.ColumnDefinitions&gt;
+    &lt;ColumnDefinition Width="*" /&gt;
+    &lt;ColumnDefinition Width="3*" /&gt;
+    &lt;ColumnDefinition Width="*" /&gt;
+&lt;/Grid.ColumnDefinitions&gt;
+</code></pre>
+
+<p>あとは、このVisibilityをVisibleにすると同時にアニメーションすれば完成です。
+ちなみにこれを呼び出す側はViewModelに用意した拡張メソッドをCallするだけです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-04.png" alt="wpf-10-04" /></p>
+
+<p>今回のポイントは[KeyboardNavigation] クラスを利用した各種添付プロパティです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-05.png" alt="wpf-10-05" /></p>
+
+<p>メッセージ ダイアログなので、デフォルトでフォーカスがあたるボタンがあります。<br/>
+この時にボタン以外にフォーカスが当たると困ります。</p>
+
+<p>MSDNを見ると</p>
+
+<blockquote><p>KeyboardNavigation  クラスは、ナビゲーション キーのいずれかが押されたときに、既定のキーボード フォーカスのナビゲーションを実装します。 ナビゲーション キーとは、Tab、Shift + Tab、Ctrl + Tab、Ctrl + Shift + Tab、上方向、下方向、左方向、および右方向の各キーを指します。</p></blockquote>
+
+<p>とあります。</p>
+
+<p>これらのキーを押してもボタン群だけフォーカスが当たるように添付プロパティを設定しています。</p>
+
+<p>いつものごとく、サンプル成果物はGit管理で。</p>
+
+<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
+
+<p>次回は画面遷移を考えてみます。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[カスタムコントロールとおまけでIsolatedStorage - WPF Vol 08]]></title>
@@ -1016,224 +1090,6 @@ Modern Style
 <p>いつものごとく、サンプル成果物はGit管理で。</p>
 
 <p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
-
-<hr />
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[WPF ViewModelでLOB開発 Vol 04 - コンポジットWPF　おまけでMEF]]></title>
-    <link href="http://s-ueno.github.io/blog/2014/10/31/wpf-04/"/>
-    <updated>2014-10-31T17:50:00+09:00</updated>
-    <id>http://s-ueno.github.io/blog/2014/10/31/wpf-04</id>
-    <content type="html"><![CDATA[<p>サンプル成果物はGit管理するようにしました。</p>
-
-<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
-
-<p>今回は、以前からお話ししていましたコンポジットWPFの片鱗と、おまけで <a href="http://msdn.microsoft.com/ja-jp/library/dd460648.aspx">MEF</a> という.Net Frameworkが提供する <a href="http://ja.wikipedia.org/wiki/%E4%BE%9D%E5%AD%98%E6%80%A7%E3%81%AE%E6%B3%A8%E5%85%A5">DI</a> について紹介します。</p>
-
-<!-- more -->
-
-
-<p>コンポジット アプリケーション は動いている画面を見ると1画面なのですが、開発時には複数のコントロールを組み合わせて動くような仕組みになります。
-Windows Formの頃はユーザーコントロールとして作成していましたが、ここで利用しているコンテンツ（View/ViewModelセット）には区別はありません。</p>
-
-<p>サンプルを起動すると以下の画面が起動します。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-04-01.png" alt="wpf-04-01" /></p>
-
-<p>フレキシブル レイアウトなので、画面を大きくすれば自動でリサイズします。</p>
-
-<p>ShellViewクラスはTabControlを持ち、TabItemとしてアサインしているのものはVol04Viewクラスです。</p>
-
-<p>Vol04Viewクラスには、前回作成した必須入力ルールをテキストボックスに適用しており、ボタン押下のタイミングで検証エラーを検知してアプリケーション例外（業務例外ともいい、致命的な例外とは区別します）をスローします。
-ここにMEFの機能を利用して、例外が業務例外ならばその内容を警告メッセージボックスとして表示する仕組みを注入しています。</p>
-
-<ul>
-<li>コンポジット構成</li>
-<li>MEFによる業務固有処理の抽入</li>
-</ul>
-
-
-<p>それぞれについて紹介します。</p>
-
-<h2>コンポジット構成</h2>
-
-<p>MVVMデザイン パターンでは、どのデータ（ViewModel）をどういう外観で描画する（View）というセットをコンテンツとして取り扱います。</p>
-
-<p>Window が持つ唯一のContentプロパティには、ContentPresenterがあり、コンテンツを表現する箱として機能します。</p>
-
-<p>ContentにViewModelをセットし、このコンテンツの外観を決定するDataTemplateSelectorを利用して、ViewModelの属性として表現したViewを適用しています。</p>
-
-<p>この仕組みはどのようなコンテンツでも適用できます。今回利用した<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.tabcontrol.aspx">TabControl</a>を確認してみます。</p>
-
-<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.tabcontrol.aspx">TabControl</a>は<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.selector.aspx">Selector</a>,<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a>とベースクラスに持ちます。</p>
-
-<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a>は複数のコンテンツを持つベースとなるクラスです。<br/>
-<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.selector.aspx">Selector</a>は、その複数コンテンツは選択および非選択ができる機能のベースクラスです。<br/>
-<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.tabcontrol.aspx">TabControl</a>はそれらの機能を持ち、各コンテンツにセットでHeaderコンテンツを持つクラスになります。</p>
-
-<p>個人的には<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a>、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.selector.aspx">Selector</a>までは優秀なのですが、これを使って作った<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.tabcontrol.aspx">TabControl</a>はちょっと残念な気がしています。
-もっと利便性が高い、複数コンテンツを選択可能なコントロールを作成するのはとても簡単なので、シリーズの中で紹介したいと思います。</p>
-
-<p>さておき、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a>などの複数のコンテンツを持つクラスは、大きく二つの機能を利用します。</p>
-
-<ul>
-<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.itemssource.aspx">ItemsControl.ItemsSource</a> プロパティ</li>
-<li><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.itemtemplateselector.aspx">ItemsControl.ItemTemplateSelector</a> プロパティ</li>
-</ul>
-
-
-<p>ItemsSourceは、その通り複数のデータを設定するプロパティです。
-ItemTemplateSelectorは、DataTemplateSelectorと同じで、それぞれのデータはどのような外観なのかを選択するための機能になります。</p>
-
-<p>WindowではContentは一つでしたが、ItemsSourceは複数のコンテンツをセットします。
-このセットする際に利便性が高いものが <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.listcollectionview.aspx">ListCollectionView</a> クラスです。</p>
-
-<p>このクラスは外観を持たないコレクションクラスであり、ViewとViewModelに分離したデザインではViewModel側で利用するクラスになります。</p>
-
-<p>ただ、このコレクションにバインドしている外観がもし選択および非選択ができる機能を有するのであれば、そこに指示するMoveCurrentToメソッドなどを持つ、かゆいところに手が届くクラスになります。
-このクラスでフィルタリングして10件を2件とした場合なども、外観にも反映され10タブを2タブにしたりすることができます。</p>
-
-<p>ShellView/ShellViewModel クラスはこのコレクションを管理する機能になります。
-コンテンツの実体はVol04View/Vol04ViewModelクラスです。</p>
-
-<p>コンポジット アプリケーションではオブジェクト指向を意識しなくても、柔軟なクラス分割を可能とし、それによって同時開発による生産性の向上や保守性の向上、またパフォーマンス向上も期待できます。</p>
-
-<p>業務要件で複雑なTab機能を有する画面を1つのクラスで作成すると、1万STEPを超えるような複雑怪奇なクラスを作りかねないのですが、このような仕組みではどのようなリッチな画面構成でも、シンプルに作成できます。</p>
-
-<h2>MEF</h2>
-
-<p>DIを利用したことがなければピンとこないかもしれません。<br/>
-要はインターフェイスに対して、後付けでインスタンスを割り当てることができる機能になります。</p>
-
-<p>LOB開発では様々な横断的関心事が出てきますが、その中には業務要件固有であるものも少なくありません。</p>
-
-<p>業務固有要件なので、システム毎に開発者が用意する機能であり、且つ横断的な関心事であればそれをあちこちでサービス呼び出しするようなことを適用したくない場合に、有効に活用できます。</p>
-
-<p>MEFを利用するためには参照設定で「System.ComponentModel.Composition」を追加する必要があります。</p>
-
-<p>サンプルのSimpleAppプロジェクトにはExceptionPolicyクラスがあります。
-このクラスはIExceptionPolicyインターフェイスを実装しています。</p>
-
-<p>このIExceptionPolicyインターフェイスを宣言し、利用しているプロジェクトはuENプロジェクトですが、実際にこのインターフェイスを実装している箇所はありません。
-仮にこのインターフェイスに実体が与えられていれば、それを動かすというコーディングのみがあります。</p>
-
-<p>MEFが提供するImport属性を宣言しているので、仮にMEF機能が働けばここにインスタンスがインポートされるイメージになります。
-開発者は、このインターフェイスを実装するクラスに対してExport属性を付与することで、そのクラスが適用される仕組みになります。</p>
-
-<p>MEFを利用するにもおまじないコードは必要なのですが、今回はRepositoryクラスを用意しました。</p>
-
-<pre><code>
-  public static class Repository
-    {
-        private static readonly List&lt;ComposablePartCatalog&gt; catalogList = new List&lt;ComposablePartCatalog&gt;();
-        static Repository()
-        {
-            var assemblies = ConfigurationManager.GetSection("Repository.AssemblyCatalog") as NameValueCollection;
-            foreach (var each in assemblies.AllKeys)
-            {
-                var assembly = LoadAssembly(each);
-                if (assembly != null)
-                {
-                    catalogList.Add(new AssemblyCatalog(assembly));
-                }
-            }
-
-            var types = ConfigurationManager.GetSection("Repository.TypeCatalog") as NameValueCollection;
-            foreach (var each in types.AllKeys)
-            {
-                var type = LoadType(each);
-                if (type != null)
-                {
-                    catalogList.Add(new TypeCatalog(type));
-                }
-            }
-
-            var catalog = new AggregateCatalog();
-            foreach (var each in catalogList)
-            {
-                catalog.Catalogs.Add(each);
-            }
-            container = new CompositionContainer(catalog);
-        }
-        private static Assembly LoadAssembly(string s)
-        {
-            Assembly assembly = null;
-            try
-            {
-                assembly = Assembly.Load(s);
-            }
-            catch
-            {
-            }
-            return assembly;
-        }
-        private static Type LoadType(string s)
-        {
-            Type type = null;
-            try
-            {
-                type = Type.GetType(s);
-            }
-            catch
-            {
-            }
-            return type;
-        }
-
-        private static CompositionContainer container;
-        public static void Compose(this object obj)
-        {
-            container.ComposeParts(obj);
-        }
-    }
-</code></pre>
-
-<p>このリポジトリが構成ファイルから読み込むべき対象を抽出して実体化可能な状態にセットします。
-利用する際には、Import属性を持つクラスのコンストラクタでCompose拡張メソッドを呼び出すことで、そのインターフェイスに自動でインスタンスが割り当てられる仕組みになります。</p>
-
-<p>以下のように利用しています。
-&#8220;`
-    public class ActionEventPolicyAttribute : Attribute, IRoutedEventPolicy
-    {
-        public ActionEventPolicyAttribute()
-        {
-            this.Compose();
-        }
-        [Import(typeof(IExceptionPolicy))]
-        public IExceptionPolicy ExceptionPolicy { get; set; }</p>
-
-<pre><code>
-アプリケーション構成ファイル(app.config)ですが、configSectionsを利用することで、任意のセクションを追加することが可能になります。
-これはmachin.configでも利用されているセクションです。
-
-
-ここに二つのレベルで依存性を注入できるようにしています。
-
- + アセンブリの中にあるExport属性の全てをMEFのカタログに登録する
- + アセンブリの中でも特定のクラスのみをMEFのカタログに登録する
-
-これによって、柔軟で且つソースコードの変更をかけずに機能を差し替えることが可能となります。
-
-
-app.config
-</code></pre>
-
-<p>&lt;?xml version=&ldquo;1.0&rdquo; encoding=&ldquo;utf-8&rdquo;?>
-<configuration>
-  <configSections>
-    <section name="Repository.AssemblyCatalog" type="System.Configuration.NameValueSectionHandler" />
-    <section name="Repository.TypeCatalog" type="System.Configuration.NameValueSectionHandler" />
-  </configSections>
-  &lt;Repository.AssemblyCatalog>
-    <add key="uEN" value="" />
-    <add key="SimpleApp" value="" />
-  &lt;/Repository.AssemblyCatalog></p>
-
-<p>  &lt;Repository.TypeCatalog>
-  &lt;/Repository.TypeCatalog>
-&#8220;`</p>
 
 <hr />
 ]]></content>

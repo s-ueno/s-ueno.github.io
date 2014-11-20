@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-20T02:02:31+09:00</updated>
+  <updated>2014-11-20T20:28:26+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ダイアログ メッセージのデザイン - WPF Vol 09]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/20/wpf-10/"/>
+    <updated>2014-11-20T20:28:15+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/20/wpf-10</id>
+    <content type="html"><![CDATA[<p>ストア アプリ風のダイアログ メッセージ を作成しました。<br/>
+もちろん、アニメーションします。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-01.png" alt="wpf-10-01" /></p>
+
+<!-- more -->
+
+
+<p>これも、いつもの如くまずはグリッド デザインから始まります。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-02.png" alt="wpf-10-02" /></p>
+
+<p>ちなみに図（と、デザイン）は<a href="http://msdn.microsoft.com/ja-jp/jj984295">ココ</a>です。<br/>
+(XPS で配布しなさいよ!!@心の声)</p>
+
+<p>Windows 8.1 UX ガイドライン というのが、どこかにあると思います。</p>
+
+<p>さて、話を戻すとWindowのデフォルトStyle上で、グリッドを比率設定してデザインしました。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-03.png" alt="wpf-10-03" /></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Grid.RowDefinitions&gt;
+</span><span class='line'>    &lt;RowDefinition Height="2*" /&gt;
+</span><span class='line'>    &lt;RowDefinition Height="auto" /&gt;
+</span><span class='line'>    &lt;RowDefinition Height="2*" /&gt;
+</span><span class='line'>&lt;/Grid.RowDefinitions&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>作業手順ですが、今回のように具体的な図を基にする場合は、Excelにイメージを張り付けた後にセルの数を数えて、6個、3個、6個で比率だと 2対1対2 だね、という大雑把に設定しています。</p>
+
+<p>次に、真ん中のメッセージタイトル、メッセージ内容、ボタンを大まかに区切っていきます。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>    &lt;ColumnDefinition Width="*" /&gt;
+</span><span class='line'>    &lt;ColumnDefinition Width="3*" /&gt;
+</span><span class='line'>    &lt;ColumnDefinition Width="*" /&gt;
+</span><span class='line'>&lt;/Grid.ColumnDefinitions&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>あとは、このVisibilityをVisibleにすると同時にアニメーションすれば完成です。
+ちなみにこれを呼び出す側はViewModelに用意した拡張メソッドをCallするだけです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-04.png" alt="wpf-10-04" /></p>
+
+<p>今回のポイントは[KeyboardNavigation] クラスを利用した各種添付プロパティです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-10-05.png" alt="wpf-10-05" /></p>
+
+<p>メッセージ ダイアログなので、デフォルトでフォーカスがあたるボタンがあります。<br/>
+この時にボタン以外にフォーカスが当たると困ります。</p>
+
+<p>MSDNを見ると</p>
+
+<blockquote><p>KeyboardNavigation  クラスは、ナビゲーション キーのいずれかが押されたときに、既定のキーボード フォーカスのナビゲーションを実装します。 ナビゲーション キーとは、Tab、Shift + Tab、Ctrl + Tab、Ctrl + Shift + Tab、上方向、下方向、左方向、および右方向の各キーを指します。</p></blockquote>
+
+<p>とあります。</p>
+
+<p>これらのキーを押してもボタン群だけフォーカスが当たるように添付プロパティを設定しています。</p>
+
+<p>いつものごとく、サンプル成果物はGit管理で。</p>
+
+<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
+
+<p>次回は画面遷移を考えてみます。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[カスタムコントロールとおまけでIsolatedStorage - WPF Vol 08]]></title>
