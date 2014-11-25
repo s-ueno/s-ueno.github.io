@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-20T20:41:47+09:00</updated>
+  <updated>2014-11-25T23:23:30+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,203 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[MEF で優先度を設けて取得できないか]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/25/wpf-11/"/>
+    <updated>2014-11-25T23:22:15+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/25/wpf-11</id>
+    <content type="html"><![CDATA[<p><a href="http://msdn.microsoft.com/ja-jp/library/dd460648.aspx">MEF</a> はMSDNだけみて使ってみたのですが、
+もう少し使い勝手が良くならないか勉強しました。</p>
+
+<!-- more -->
+
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/dd460648.aspx">MEF</a> の基本は、実体化したいオブジェクトの取得元となる情報を <a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.primitives.composablepartcatalog.aspx">ComposablePartCatalog</a> クラスから派生した
+<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.hosting.assemblycatalog.aspx">AssemblyCatalog</a> クラス や<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.hosting.typecatalog.aspx">TypeCatalog</a> クラス を用いてアセンブリやTypeの情報を
+<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.hosting.compositioncontainer.aspx">CompositionContainer</a> というコンテナに登録、このコンテナから実体化する
+ことまでは直観的にわかりました。</p>
+
+<p>ただ、Get××とかCreate××のような如何にもインスタンス取得できそうなメソッドがなく、
+MSDNのサンプルでは <a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.attributedmodelservices.composeparts.aspx">container.ComposeParts</a> メソッド 呼び出すことで
+メンバーに実体が割り当てられるという、あまり使い勝手がよくない状態でした。</p>
+
+<p>当たり前のDIとして、以下のようなことができないのか</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>interface ITest
+</span><span class='line'>{
+</span><span class='line'>}
+</span><span class='line'>class TestA : ITest
+</span><span class='line'>{
+</span><span class='line'>}
+</span><span class='line'>class TestB : TestA
+</span><span class='line'>{
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>static void Sample()
+</span><span class='line'>{
+</span><span class='line'>//優先度をもってTestA、TestBのいずれかを取得したい
+</span><span class='line'>var service = Create&lt;ITest&gt;();
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>いろいろわかりました。</p>
+
+<p>まず、<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.attributedmodelservices.composeparts.aspx">container.ComposeParts</a> メソッド を利用しないサービス取得の場合は、Import属性は不要でした。
+そもそも、<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.attributedmodelservices.composeparts.aspx">container.ComposeParts</a> メソッド を利用するシーンの方が少ないような気もします。</p>
+
+<p>何はともあれ、<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.partcreationpolicyattribute.aspx">PartCreationPolicy属性</a>も付けます。<br/>
+この属性を付与しない場合、コンテナからインスタンスを取得するとすべて同じインスタンスを返します。</p>
+
+<p>これがデフォルト動作で、これでは困るので先ほどの属性を利用して、実体化する場合は新しいインスタンスとなるように明示します。</p>
+
+<p>次に <a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.exportmetadataattribute.aspx">ExportMetadata属性</a> でオブジェクトに追加情報を付与します。</p>
+
+<p>以下がサンプルの宣言です。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>[PartCreationPolicy(CreationPolicy.NonShared)]
+</span><span class='line'>[ExportMetadata("Priority", 1)]
+</span><span class='line'>[Export(typeof(TestA))]
+</span><span class='line'>class TestA  { }
+</span><span class='line'>
+</span><span class='line'>[PartCreationPolicy(CreationPolicy.NonShared)]
+</span><span class='line'>[ExportMetadata("Priority", 0)]
+</span><span class='line'>[Export(typeof(TestA))]
+</span><span class='line'>class TestB : TestA { }</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ExportMetadata属性で、&#8221;Priority&#8221; という優先度の付加情報を付与しました。<br/>
+この取得方法が面白いです。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>public interface IPriority { int Priority { get; } }
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>このように、&#8221;Priority&#8221; というプロパティ名を持つインターフェイスを宣言します。
+ちなみに、このインターフェイスはどこも実装はされていません。</p>
+
+<p>このインターフェイスが判断材料用のオブジェクトとして、コンテナによって動的に実態化されます。</p>
+
+<p>以下がサンプルになります。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>public static class Hoge
+</span><span class='line'>{
+</span><span class='line'>    [PartCreationPolicy(CreationPolicy.NonShared)]
+</span><span class='line'>    [ExportMetadata("Priority", 1)]
+</span><span class='line'>    [Export(typeof(TestA))]
+</span><span class='line'>    class TestA  { }
+</span><span class='line'>
+</span><span class='line'>    [PartCreationPolicy(CreationPolicy.NonShared)]
+</span><span class='line'>    [ExportMetadata("Priority", 0)]
+</span><span class='line'>    [Export(typeof(TestA))]
+</span><span class='line'>    class TestB : TestA { }
+</span><span class='line'>
+</span><span class='line'>    public static void Sample()
+</span><span class='line'>    {
+</span><span class='line'>        var service = Create&lt;TestA&gt;();
+</span><span class='line'>
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    /// &lt;summary&gt;静的コンストラクタ&lt;/summary&gt;
+</span><span class='line'>    static Hoge()
+</span><span class='line'>    {
+</span><span class='line'>        var catalog = new AssemblyCatalog(Assembly.GetExecutingAssembly());
+</span><span class='line'>        Container = new CompositionContainer(catalog);
+</span><span class='line'>    }
+</span><span class='line'>    private static readonly CompositionContainer Container;
+</span><span class='line'>
+</span><span class='line'>    public interface IPriority { int Priority { get; } }
+</span><span class='line'>    public static T Create&lt;T&gt;()
+</span><span class='line'>    {
+</span><span class='line'>        var list = Container.GetExports&lt;T, IPriority&gt;();
+</span><span class='line'>        var mostPriority = list.OrderBy(x =&gt; x.Metadata.Priority)
+</span><span class='line'>                               .FirstOrDefault();
+</span><span class='line'>        return mostPriority != null ? mostPriority.Value : default(T);
+</span><span class='line'>    }
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/dd833149.aspx">GetExports</a> メソッドの型パラメーター 1 は、取得したい型で、
+2つ目の引数は判断材料となる<a href="http://msdn.microsoft.com/ja-jp/library/system.componentmodel.composition.exportmetadataattribute.aspx">ExportMetadata属性</a> の情報を転送できる
+任意のインターフェイスなりクラスとなります。</p>
+
+<p>ここに IPriority インターフェイスを設定すると、コンテナがGUIDを利用して動的クラスを構築、生成し、
+そのメンバに属性値を割り当ててくれます。</p>
+
+<p>そのため、その任意の判断材料を利用して複数のクラスからある特定のクラスを返すことができるようになります。</p>
+
+<p>今回は Priority という優先度のサンプルでしたが、たとえばデータベースのサービス名などを文字として
+切り分け判断材料に利用すれば、データベース非依存のサービスなどいろいろと応用ができそうです。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ダイアログ メッセージのデザイン - WPF Vol 09]]></title>
