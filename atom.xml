@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-25T23:23:30+09:00</updated>
+  <updated>2014-11-27T20:29:33+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Jekyll の Paginate が仕事しない]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/27/wpf-12/"/>
+    <updated>2014-11-27T20:28:15+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/27/wpf-12</id>
+    <content type="html"><![CDATA[<p>jekyll-paginate が仕事しない事にここ数日悩まされました&hellip;</p>
+
+<!-- more -->
+
+
+<p>WPF でパンくずリストを画面遷移に採用したのを執筆したかったのですが
+(git 上は開発ブランチからメイン トランクにリリースしました。)
+本業で3連休つぶれるし jekyll-paginate が仕事しないし、散々でした。</p>
+
+<p>_config.yml で</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>paginate: 10 
+</span><span class='line'>paginate_path: "posts/:num"
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>と、宣言するとページネーターが 10 記事より過去の記事を 前のページ みたいに
+自動生成してくれるハズだったのですが、これが0Byteのファイルしかできなくて（涙）</p>
+
+<p>原因は plugins の category_generator.rb と tag_generator.rb だとわかったのですが
+解決の方向性を誤りまして・・・。</p>
+
+<p>なんとか、ジェネレートできないかgemのバージョンやjekyllのrubyのソースにバグがないかとか
+index.htmlの構文誤りがないかとか、あさっての方向に全力疾走しまして。</p>
+
+<p>無駄に3夜ほど費やしました。</p>
+
+<p>原因わかってるなら、問題のプラグインをrb.bkか何かにリネームしてページネーターが
+ジェネレートした過去記事用のHTMLだけ git にチェックインすればいいのでは？</p>
+
+<p>と気づいたのが今日でした。</p>
+
+<p>gitユーザーには周知の事実だったのかもしれないのですが(涙)</p>
+
+<p>jekyllやrubyはバージョンにも泣かされたし、どこかのタイミングでjekyll写経して
+ruby勉強しないとイケないかもしれません。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[MEF で優先度を設けて取得できないか]]></title>

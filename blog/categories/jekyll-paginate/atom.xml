@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Jekyll-paginate | uEN Laboratory]]></title>
+  <link href="http://s-ueno.github.io/blog/categories/jekyll-paginate/atom.xml" rel="self"/>
+  <link href="http://s-ueno.github.io/"/>
+  <updated>2014-11-27T20:29:33+09:00</updated>
+  <id>http://s-ueno.github.io/</id>
+  <author>
+    <name><![CDATA[uEN]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Jekyll の Paginate が仕事しない]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/27/wpf-12/"/>
+    <updated>2014-11-27T20:28:15+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/27/wpf-12</id>
+    <content type="html"><![CDATA[<p>jekyll-paginate が仕事しない事にここ数日悩まされました&hellip;</p>
+
+<!-- more -->
+
+
+<p>WPF でパンくずリストを画面遷移に採用したのを執筆したかったのですが
+(git 上は開発ブランチからメイン トランクにリリースしました。)
+本業で3連休つぶれるし jekyll-paginate が仕事しないし、散々でした。</p>
+
+<p>_config.yml で</p>
+
+<pre><code>
+paginate: 10 
+paginate_path: "posts/:num"
+</code></pre>
+
+<p>と、宣言するとページネーターが 10 記事より過去の記事を 前のページ みたいに
+自動生成してくれるハズだったのですが、これが0Byteのファイルしかできなくて（涙）</p>
+
+<p>原因は plugins の category_generator.rb と tag_generator.rb だとわかったのですが
+解決の方向性を誤りまして・・・。</p>
+
+<p>なんとか、ジェネレートできないかgemのバージョンやjekyllのrubyのソースにバグがないかとか
+index.htmlの構文誤りがないかとか、あさっての方向に全力疾走しまして。</p>
+
+<p>無駄に3夜ほど費やしました。</p>
+
+<p>原因わかってるなら、問題のプラグインをrb.bkか何かにリネームしてページネーターが
+ジェネレートした過去記事用のHTMLだけ git にチェックインすればいいのでは？</p>
+
+<p>と気づいたのが今日でした。</p>
+
+<p>gitユーザーには周知の事実だったのかもしれないのですが(涙)</p>
+
+<p>jekyllやrubyはバージョンにも泣かされたし、どこかのタイミングでjekyll写経して
+ruby勉強しないとイケないかもしれません。</p>
+]]></content>
+  </entry>
+  
+</feed>
