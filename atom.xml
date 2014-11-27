@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-27T20:29:33+09:00</updated>
+  <updated>2014-11-27T22:18:02+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Jekyll の Paginate が仕事しない]]></title>
+    <title type="html"><![CDATA[jekyll の Paginate が仕事しない]]></title>
     <link href="http://s-ueno.github.io/blog/2014/11/27/wpf-12/"/>
     <updated>2014-11-27T20:28:15+09:00</updated>
     <id>http://s-ueno.github.io/blog/2014/11/27/wpf-12</id>
@@ -1986,7 +1986,7 @@ StaticResourceが定数としたら、DynamicResourceは書き換え可能な変
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[What Is the Difference Between Art and Design?]]></title>
+    <title type="html"><![CDATA[What is the difference between art and design?]]></title>
     <link href="http://s-ueno.github.io/blog/2014/11/11/wpf-05/"/>
     <updated>2014-11-11T01:09:00+09:00</updated>
     <id>http://s-ueno.github.io/blog/2014/11/11/wpf-05</id>
