@@ -72,6 +72,7 @@ $(function(){
       count: githubInfo.data('github-repo-count'),
       skip_forks: githubInfo.data('github-skip-forks'),
       skip_github_io: githubInfo.data('github-skip-github-io'),
+      skip_ignorekeyword: githubInfo.data('github-skip-ignorekeyword'),
       target: githubInfo
     });
   }

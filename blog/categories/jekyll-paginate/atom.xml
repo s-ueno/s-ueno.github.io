@@ -4,7 +4,7 @@
   <title><![CDATA[Category: jekyll-paginate | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/jekyll-paginate/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-27T22:48:42+09:00</updated>
+  <updated>2014-11-28T17:47:05+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -51,7 +51,7 @@ index.htmlの構文誤りがないかとか、あさっての方向に全力疾�
 <p>と気づいたのが今日でした。
 それでうまくいったのですが、別のStyleではどうかとテストしてみたところ、またダメでした。</p>
 
-<p>ちょっとジキルさん使うよりもHTMLコーディングした方が早い気がするんですが（怒）</p>
+<p>種々のバグ修正しながら、これは ruby を写経しなさいとの啓示かもしれません。</p>
 ]]></content>
   </entry>
   
