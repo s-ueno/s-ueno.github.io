@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-28T17:47:05+09:00</updated>
+  <updated>2014-11-29T02:35:14+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,226 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[WPF パンくずリストで画面遷移]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/11/29/wpf-13/"/>
+    <updated>2014-11-29T02:35:15+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/11/29/wpf-13</id>
+    <content type="html"><![CDATA[<p>ナビゲーターとしてのインターフェイス + Styleによるパンくずリストの外観を
+併せ持つパンくずリストクラスです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-13-01.png" alt="wpf-13-01" /></p>
+
+<!-- more -->
+
+
+<p>ベースクラスを <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a> とするカスタム コントロールとして作成しました。<br/>
+上部にメニューを配置し、中央部がメインコンテンツという最もシンプルなパターンです。</p>
+
+<p>いつものごとく、Styleを利用して グリッド レイアウトで区切っていきます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-13-02.png" alt="wpf-13-02" /></p>
+
+<p>ここで、メインコンテンツと右上部のアイコンは増減しませんが、左上部のパンくずメニューは遷移によって
+コンテンツが増減する、 <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a> の実体の部分になります。</p>
+
+<p>この実態部のコンテンツを表すのが <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemspresenter.aspx">ItemsPresenter</a> クラスです。</p>
+
+<p>ItemsControl.Items プロパティにButtonを10個投入した場合、この <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemspresenter.aspx">ItemsPresenter</a> の箇所にButtonが10個表示されます。</p>
+
+<p>ちなみに ItemsControl の実体が ItemsPresenter であり、
+ContentControl の実体は ContentPresenter という、シンプルな名前です。</p>
+
+<p>次に Item をどのようなパネルに展開するのかを決定するのが、 ItemsControl.ItemsPanel プロパティです。</p>
+
+<p>メニューなので横に展開することができる <code>&lt;WrapPanel Orientation="Horizontal" /&gt;</code> を指定することで、要件を満たせます。</p>
+
+<p>あとは右上に アイコンボタン(Designed by <a href="http://modernuiicons.com/">Alex Peattie</a> )
+中央に ViewModel を指定するとそのViewを表示することができるカスタムの DataTemplateSelector
+を指定した ContentPresenter を配置すると カスタム コントロールとしての外観は完成です。</p>
+
+<p>60行程度のとてもシンプルな定義です。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;ui:ViewDataTemplateSelector x:Key="templateSelector" /&gt;
+</span><span class='line'>&lt;Style TargetType="{x:Type local:Breadcrumb}"&gt;
+</span><span class='line'>    &lt;Setter Property="Focusable" Value="False" /&gt;
+</span><span class='line'>    &lt;Setter Property="FocusVisualStyle" Value="{x:Null}"/&gt;
+</span><span class='line'>    &lt;Setter Property="KeyboardNavigation.TabNavigation" Value="Local" /&gt;
+</span><span class='line'>    &lt;Setter Property="ItemsPanel"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ItemsPanelTemplate&gt;
+</span><span class='line'>                &lt;WrapPanel Orientation="Horizontal" /&gt;
+</span><span class='line'>            &lt;/ItemsPanelTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>    &lt;Setter Property="Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate TargetType="{x:Type local:Breadcrumb}"&gt;
+</span><span class='line'>                &lt;Grid Margin="7"&gt;
+</span><span class='line'>                    &lt;Grid.RowDefinitions&gt;
+</span><span class='line'>                        &lt;RowDefinition Height="auto" /&gt;
+</span><span class='line'>                        &lt;RowDefinition Height="*" /&gt;
+</span><span class='line'>                    &lt;/Grid.RowDefinitions&gt;
+</span><span class='line'>                    &lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>                        &lt;ColumnDefinition Width="auto" /&gt;
+</span><span class='line'>                        &lt;ColumnDefinition Width="*" /&gt;
+</span><span class='line'>                    &lt;/Grid.ColumnDefinitions&gt;
+</span><span class='line'>                    &lt;ItemsPresenter Name="MyPresenter" Margin="20,0" HorizontalAlignment="Left" VerticalAlignment="Center" /&gt;
+</span><span class='line'>                    &lt;StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Column="1"&gt;
+</span><span class='line'>                        &lt;Button x:Name="HomeButton" Width="35" Height="35" 
+</span><span class='line'>                                HorizontalContentAlignment="Right"
+</span><span class='line'>                                Foreground="{DynamicResource AppForeground}"
+</span><span class='line'>                                BorderBrush="Transparent"
+</span><span class='line'>                                Style="{DynamicResource EllipseButtonStyle}" 
+</span><span class='line'>                                &gt;
+</span><span class='line'>                            &lt;Viewbox Stretch="Fill"&gt;
+</span><span class='line'>                                &lt;Path Style="{DynamicResource PathButtonStyle}"
+</span><span class='line'>                                      Data="F1 M 24.0033,56.0078L 24.0033,38.0053L 22.0031,40.0056L 19.0027,35.0049L 38.0053,20.0028L 45.0063,25.5299L 45.0063,21.753L 49.0068,21.0029L 49.0068,28.6882L 57.008,35.0049L 54.0075,40.0056L 52.0073,38.0053L 52.0073,56.0078L 24.0033,56.0078 Z M 38.0053,26.9204L 27.0038,36.005L 27.0038,53.0074L 33.0046,53.0074L 33.0046,42.006L 43.006,42.006L 43.006,53.0074L 49.0068,53.0074L 49.0068,36.005L 38.0053,26.9204 Z " /&gt;
+</span><span class='line'>                            &lt;/Viewbox&gt;
+</span><span class='line'>                        &lt;/Button&gt;
+</span><span class='line'>                        &lt;Button x:Name="NewWindowButton" Width="35" Height="35" 
+</span><span class='line'>                                HorizontalContentAlignment="Right"
+</span><span class='line'>                                Foreground="{DynamicResource AppForeground}"
+</span><span class='line'>                                BorderBrush="Transparent"
+</span><span class='line'>                                Style="{DynamicResource EllipseButtonStyle}" 
+</span><span class='line'>                                &gt;
+</span><span class='line'>                            &lt;Viewbox Stretch="Fill"&gt;
+</span><span class='line'>                                &lt;Path Style="{DynamicResource PathButtonStyle}"
+</span><span class='line'>                                      Data="F1 M 44.3333,19L 57,19L 57,31.6667L 52.25,36.4167L 52.25,27.7083L 34.8333,45.125L 30.875,41.1667L 48.2917,23.75L 39.5833,23.75L 44.3333,19 Z M 19,25.3333L 42.75,25.3333L 38,30.0833L 23.75,30.0833L 23.75,52.25L 45.9167,52.25L 45.9167,38L 50.6667,33.25L 50.6667,57L 19,57L 19,25.3333 Z " /&gt;
+</span><span class='line'>                            &lt;/Viewbox&gt;
+</span><span class='line'>                        &lt;/Button&gt;
+</span><span class='line'>                    &lt;/StackPanel&gt;
+</span><span class='line'>                    &lt;ContentPresenter x:Name="MainContent" Grid.Row="1" Grid.ColumnSpan="2" Margin="10"
+</span><span class='line'>                                      Content="{TemplateBinding MainContent}"
+</span><span class='line'>                                      ContentTemplateSelector="{StaticResource templateSelector}" /&gt;
+</span><span class='line'>                &lt;/Grid&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ナビゲーターとしてのインターフェイス　+　いつものごとくアニメーションをC#のコード上で実装すれば完成です。</p>
+
+<p>ポイントがいくつかあるので紹介します。</p>
+
+<ul>
+<li>MEFの利用</li>
+<li>アニメーション</li>
+<li>NewWindowボタン</li>
+<li><a href="http://msdn.microsoft.com/ja-jp/library/system.weakreference.aspx">WeakReference</a>の利用</li>
+</ul>
+
+
+<h2>MEFの利用</h2>
+
+<p>Use添付プロパティを公開し、trueが設定されると自分自身をMEF経由でインスタンス化するようにしています。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-13-03.png" alt="wpf-13-03" /></p>
+
+<p>設定側</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-13-04.png" alt="wpf-13-04" /></p>
+
+<h2>アニメーション</h2>
+
+<p>パンくずメニューに新しくアイテムが追加されると、画面右側からButtonが飛んでくるアニメーションです。
+これもシンプルで ItemsControl.Items プロパティ に Button を Add するタイミングで、 Storyboard を適用すればOKです。</p>
+
+<h2>NewWindowボタン</h2>
+
+<p>LOBアプリでは画面を見比べることもあるだろうと、NewWindowボタンを用意しました。
+ボタン押下で表示しているメインコンテンツが新しいWindowsとして起動する機能です。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-13-05.png" alt="wpf-13-05" /></p>
+
+<p>今は単純に新しいWindow表示していますが、どこかのタイミングでガバーフローとして
+画面をスタックし、アニメーション表示する機能に差し替えたいと思います。</p>
+
+<h2><a href="http://msdn.microsoft.com/ja-jp/library/system.weakreference.aspx">WeakReference</a>の利用</h2>
+
+<p>最後に、<a href="http://msdn.microsoft.com/ja-jp/library/system.weakreference.aspx">WeakReference</a>についてです。</p>
+
+<p>過去に紹介しましたが、親ViewModel が 子ViewModel を New し、それを ListCollectionView 経由で Tab 風に表示させたりしています。
+ライフサイクル管理の基本は、Newした人が破棄まで担当するので、この場合は 親ViewModel が子ViewModelの破棄までを担当します。</p>
+
+<p>このときに、ナビゲーターが直接子ViewModelのインスタンスへの参照を持ってしまうと、
+メモリに残り続けてガベージコレクタの対象にならないようなことも十分に起こりえます。</p>
+
+<p>ナビゲーターは指示されればViewModelを参照して遷移しますが、その参照は&#8221;弱い参照&#8221;である必要があります。
+そこで利用するのが、<a href="http://msdn.microsoft.com/ja-jp/library/system.weakreference.aspx">WeakReference</a>です。</p>
+
+<p>このクラス経由で参照する場合、ガベージコレクタは参照にカウントしないので、不要なメモリリークを防ぐことができます。</p>
+
+<p>あと、いくつかの基本的な機能（TextBox、DataGrid、ToggleButton系）のModern Style化と拡張を紹介できれば、アプリケーション作成に入りたいと思います。</p>
+
+<p>サンプルはコチラ
+<a href="https://github.com/s-ueno/uENLab" rel="tooltip" title="uENLab">
+  <img class="social_icon" alt="github icon" src="http://s-ueno.github.io/images/glyphicons_381_github.png">
+</a></p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[jekyll の Paginate が仕事しない]]></title>
