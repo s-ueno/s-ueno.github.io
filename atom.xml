@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-11-30T23:29:38+09:00</updated>
+  <updated>2014-12-02T22:08:40+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,240 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Modern Style TextBox]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/12/02/wpf-14/"/>
+    <updated>2014-12-02T22:10:27+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/12/02/wpf-14</id>
+    <content type="html"><![CDATA[<p>TextBox の Style を Modern Style 対応します。</p>
+
+<!-- more -->
+
+
+<p>まずは土台を取得したいので、VisualStudio のデザイナ上で TextBox を右クリック
+ ⇒ テンプレートの編集 ⇒ コピーして編集で生成されるテンプレートを利用したいと思います。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-14-01.png" alt="wpf-14-01" /></p>
+
+<p>ちなみに、現在適用されているデフォルトのテーマで出力されるので、Windows 7 と 8 では違った値がでると思います。
+で、8で出力されたのがコレ</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>    &lt;SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/&gt;
+</span><span class='line'>    &lt;SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/&gt;
+</span><span class='line'>    &lt;SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/&gt;
+</span><span class='line'>    &lt;Style x:Key="TextBoxStyle1" TargetType="{x:Type TextBox}"&gt;
+</span><span class='line'>        &lt;Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/&gt;
+</span><span class='line'>        &lt;Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/&gt;
+</span><span class='line'>        &lt;Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/&gt;
+</span><span class='line'>        &lt;Setter Property="BorderThickness" Value="1"/&gt;
+</span><span class='line'>        &lt;Setter Property="KeyboardNavigation.TabNavigation" Value="None"/&gt;
+</span><span class='line'>        &lt;Setter Property="HorizontalContentAlignment" Value="Left"/&gt;
+</span><span class='line'>        &lt;Setter Property="FocusVisualStyle" Value="{x:Null}"/&gt;
+</span><span class='line'>        &lt;Setter Property="AllowDrop" Value="true"/&gt;
+</span><span class='line'>        &lt;Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/&gt;
+</span><span class='line'>        &lt;Setter Property="Stylus.IsFlicksEnabled" Value="False"/&gt;
+</span><span class='line'>        &lt;Setter Property="Template"&gt;
+</span><span class='line'>            &lt;Setter.Value&gt;
+</span><span class='line'>                &lt;ControlTemplate TargetType="{x:Type TextBox}"&gt;
+</span><span class='line'>                    &lt;Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True"&gt;
+</span><span class='line'>                        &lt;ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/&gt;
+</span><span class='line'>                    &lt;/Border&gt;
+</span><span class='line'>                    &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                        &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>                            &lt;Setter Property="Opacity" TargetName="border" Value="0.56"/&gt;
+</span><span class='line'>                        &lt;/Trigger&gt;
+</span><span class='line'>                        &lt;Trigger Property="IsMouseOver" Value="true"&gt;
+</span><span class='line'>                            &lt;Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/&gt;
+</span><span class='line'>                        &lt;/Trigger&gt;
+</span><span class='line'>                        &lt;Trigger Property="IsKeyboardFocused" Value="true"&gt;
+</span><span class='line'>                            &lt;Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focus.Border}"/&gt;
+</span><span class='line'>                        &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>                &lt;/ControlTemplate&gt;
+</span><span class='line'>            &lt;/Setter.Value&gt;
+</span><span class='line'>        &lt;/Setter&gt;
+</span><span class='line'>        &lt;Style.Triggers&gt;
+</span><span class='line'>            &lt;MultiTrigger&gt;
+</span><span class='line'>                &lt;MultiTrigger.Conditions&gt;
+</span><span class='line'>                    &lt;Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/&gt;
+</span><span class='line'>                    &lt;Condition Property="IsSelectionActive" Value="false"/&gt;
+</span><span class='line'>                &lt;/MultiTrigger.Conditions&gt;
+</span><span class='line'>                &lt;Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/&gt;
+</span><span class='line'>            &lt;/MultiTrigger&gt;
+</span><span class='line'>        &lt;/Style.Triggers&gt;
+</span><span class='line'>    &lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>VS2013 Update 4 ですが、自動生成した MultiTrigger の Condition の設定値が実は逆というバグは愛嬌ということで(ニコッ)</p>
+
+<p>まず、シンプルなのが一目でわかります。<br/>
+Triggerも非活性時には不透明度を設定することでそれっぽく見せるなど、小粋です。
+リソースのキーが <code>x:Key="TextBox.MouseOver.Border"</code> とか <code>x:Key="TextBox.Focus.Border"</code> など、.で区切るところが
+個人的にとても気に入りました。</p>
+
+<p>ちなみに、ほとんど変える箇所はなく、現在 Background や Foreground が静的参照なので、これを
+アプリケーションで統一的なキーに DynamicResource で置き換えるだけです。</p>
+
+<p>WPFの組み込みコントロールで、特にLOB開発に利用するコントロールなどは限られているので、
+こんな感じで、技術資産をためていくと、後の開発で楽にガバナンスを効かせられます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-14-02.png" alt="wpf-14-02" /></p>
+
+<p>で、作成したのがコレ。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>    &lt;Style TargetType="{x:Type TextBox}"&gt;
+</span><span class='line'>        &lt;Setter Property="Background"       Value="{DynamicResource TextBox.Background}"/&gt;
+</span><span class='line'>        &lt;Setter Property="BorderBrush"      Value="{DynamicResource TextBox.BorderBrush}"/&gt;
+</span><span class='line'>        &lt;Setter Property="Foreground"       Value="{DynamicResource AppForeground}"/&gt;
+</span><span class='line'>        &lt;Setter Property="BorderThickness"  Value="1"/&gt;
+</span><span class='line'>
+</span><span class='line'>        &lt;Setter Property="KeyboardNavigation.TabNavigation" Value="None"/&gt;
+</span><span class='line'>        &lt;Setter Property="HorizontalContentAlignment"       Value="Left"/&gt;
+</span><span class='line'>        &lt;Setter Property="FocusVisualStyle"                 Value="{x:Null}"/&gt;
+</span><span class='line'>        &lt;Setter Property="AllowDrop"                        Value="true"/&gt;
+</span><span class='line'>        &lt;Setter Property="ScrollViewer.PanningMode"         Value="VerticalFirst"/&gt;
+</span><span class='line'>        &lt;Setter Property="Stylus.IsFlicksEnabled"           Value="False"/&gt;
+</span><span class='line'>        &lt;Setter Property="Template"&gt;
+</span><span class='line'>            &lt;Setter.Value&gt;
+</span><span class='line'>                &lt;ControlTemplate TargetType="{x:Type TextBox}"&gt;
+</span><span class='line'>                    &lt;Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" 
+</span><span class='line'>                            BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True"&gt;
+</span><span class='line'>                        &lt;ScrollViewer x:Name="PART_ContentHost" Focusable="false" 
+</span><span class='line'>                                      HorizontalScrollBarVisibility="Hidden" 
+</span><span class='line'>                                      VerticalScrollBarVisibility="Hidden"/&gt;
+</span><span class='line'>                    &lt;/Border&gt;
+</span><span class='line'>                    &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                        &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>                            &lt;Setter Property="Opacity" TargetName="border" Value="0.56"/&gt;
+</span><span class='line'>                        &lt;/Trigger&gt;
+</span><span class='line'>                        &lt;Trigger Property="IsMouseOver" Value="true"&gt;
+</span><span class='line'>                            &lt;Setter Property="Background" TargetName="border" Value="{DynamicResource TextBox.MouseOver.Background}"/&gt;
+</span><span class='line'>                        &lt;/Trigger&gt;
+</span><span class='line'>                        &lt;Trigger Property="IsKeyboardFocused" Value="true"&gt;
+</span><span class='line'>                            &lt;Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource TextBox.Focus.Border}"/&gt;
+</span><span class='line'>                        &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>                &lt;/ControlTemplate&gt;
+</span><span class='line'>            &lt;/Setter.Value&gt;
+</span><span class='line'>        &lt;/Setter&gt;
+</span><span class='line'>        &lt;Style.Triggers&gt;
+</span><span class='line'>            &lt;MultiTrigger&gt;
+</span><span class='line'>                &lt;MultiTrigger.Conditions&gt;
+</span><span class='line'>                    &lt;Condition Property="IsInactiveSelectionHighlightEnabled" Value="false"/&gt;
+</span><span class='line'>                    &lt;Condition Property="IsSelectionActive" Value="true"/&gt;
+</span><span class='line'>                &lt;/MultiTrigger.Conditions&gt;
+</span><span class='line'>                &lt;Setter Property="SelectionBrush" Value="{DynamicResource TextBox.SelectionBrush}"/&gt;
+</span><span class='line'>            &lt;/MultiTrigger&gt;
+</span><span class='line'>        &lt;/Style.Triggers&gt;
+</span><span class='line'>    &lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>TextBoxまで作成すると、背景色を白ベースか黒ベースかという選択肢も追加できます。</p>
+
+<p>テキストボックスの選択している箇所がブランドカラーになるのも美しいです。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-14-03.png" alt="wpf-14-03" /></p>
+
+<p>TextBoxなどはまだ簡単なのですが、ラジオボタン、コンボボックスとなるにつれて、VisualStudioが自動生成してくれる
+テンプレートが挑発的です。</p>
+
+<p>次回は、ラジオボタンを紹介します。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[WPF パンくずリストで画面遷移]]></title>
