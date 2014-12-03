@@ -129,10 +129,10 @@ $(document).ready( function () {
 
 
 
+  
 
-
-    <time datetime="2014-12-02T22:10:27+09:00" pubdate data-updated="true">
-        <span class='month'>Dec</span> <span class='day'>02</span> <span class='year'>2014</span>
+    <time datetime="2014-12-03T12:50:31+09:00" class="updated">
+        Updated <span class='month'>Dec</span> <span class='day'>03</span> <span class='year'>2014</span>
     </time>
    - 
         
@@ -256,7 +256,14 @@ posted in
 </span><span class='line'>    &lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
 
 
-<p>VS2013 Update 4 ですが、自動生成した MultiTrigger の Condition の設定値が実は逆というバグは愛嬌ということで(ニコッ)</p>
+<p>訂正</p>
+
+<p>よくみると、IsInactiveSelectionHighlightEnabledなので、フォーカスが外れた際のアクティブでない選択した項目の背景　でした・・・。
+VisualStudio先生、すみませんでした。</p>
+
+<p><del>
+VS2013 Update 4 ですが、自動生成した MultiTrigger の Condition の設定値が実は逆というバグは愛嬌ということで(ニコッ)
+</del></p>
 
 <p>まず、シンプルなのが一目でわかります。<br/>
 Triggerも非活性時には不透明度を設定することでそれっぽく見せるなど、小粋です。
@@ -319,6 +326,12 @@ Triggerも非活性時には不透明度を設定することでそれっぽく�
 <span class='line-number'>44</span>
 <span class='line-number'>45</span>
 <span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>
 </span><span class='line'>    &lt;Style TargetType="{x:Type TextBox}"&gt;
 </span><span class='line'>        &lt;Setter Property="Background"       Value="{DynamicResource TextBox.Background}"/&gt;
@@ -358,10 +371,16 @@ Triggerも非活性時には不透明度を設定することでそれっぽく�
 </span><span class='line'>        &lt;Style.Triggers&gt;
 </span><span class='line'>            &lt;MultiTrigger&gt;
 </span><span class='line'>                &lt;MultiTrigger.Conditions&gt;
-</span><span class='line'>                    &lt;Condition Property="IsInactiveSelectionHighlightEnabled" Value="false"/&gt;
 </span><span class='line'>                    &lt;Condition Property="IsSelectionActive" Value="true"/&gt;
 </span><span class='line'>                &lt;/MultiTrigger.Conditions&gt;
 </span><span class='line'>                &lt;Setter Property="SelectionBrush" Value="{DynamicResource TextBox.SelectionBrush}"/&gt;
+</span><span class='line'>            &lt;/MultiTrigger&gt;
+</span><span class='line'>            &lt;MultiTrigger&gt;
+</span><span class='line'>                &lt;MultiTrigger.Conditions&gt;
+</span><span class='line'>                    &lt;Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/&gt;
+</span><span class='line'>                    &lt;Condition Property="IsSelectionActive" Value="false"/&gt;
+</span><span class='line'>                &lt;/MultiTrigger.Conditions&gt;
+</span><span class='line'>                &lt;Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/&gt;
 </span><span class='line'>            &lt;/MultiTrigger&gt;
 </span><span class='line'>        &lt;/Style.Triggers&gt;
 </span><span class='line'>    &lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
@@ -410,10 +429,10 @@ Triggerも非活性時には不透明度を設定することでそれっぽく�
 
 
 
+  
 
-
-    <time datetime="2014-12-02T22:10:27+09:00" pubdate data-updated="true">
-        <span class='month'>Dec</span> <span class='day'>02</span> <span class='year'>2014</span>
+    <time datetime="2014-12-03T12:50:31+09:00" class="updated">
+        Updated <span class='month'>Dec</span> <span class='day'>03</span> <span class='year'>2014</span>
     </time>
    - 
       
