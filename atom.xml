@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-12-03T12:54:04+09:00</updated>
+  <updated>2014-12-04T12:47:47+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -2177,7 +2177,7 @@ StaticResourceが定数としたら、DynamicResourceは書き換え可能な変
 <p>各種プロパティに設定している<a href="http://msdn.microsoft.com/ja-jp/library/ms742882.aspx">TemplateBinding</a>は、別のコントロール プロパティ値を参照するバインディング機能になります。
 ここでは、ButtonChrome.BorderBrushは、ControlTemplateで定義されているButton(つまりもともとのコントロール)のBorderBrush値を参照するように設定されています。</p>
 
-<p><a href="http://msdn.microsoft.com/ja-jp/library/ms742882.aspx">TemplateBinding</a> はより具体的で柔軟な設定を可能とし、例えば2個上の親コンテンツのプロパティ値や、指定した親の型が見つかればその値を利用するなど、カスタム コントロールを作成するレベルでは、とても重宝するバインディング機能の一つです。</p>
+<p><del><a href="http://msdn.microsoft.com/ja-jp/library/ms742882.aspx">TemplateBinding</a> </del> <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.data.binding.aspx">Binding</a> はより具体的で柔軟な設定を可能とし、例えば2個上の親コンテンツのプロパティ値や、指定した親の型が見つかればその値を利用するなど、カスタム コントロールを作成するレベルでは、とても重宝するバインディング機能の一つです。</p>
 
 <p>WPFはバインディングとテンプレートが肝要と紹介する所以です。</p>
 
