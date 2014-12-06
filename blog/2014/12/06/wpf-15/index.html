@@ -1,0 +1,762 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Modern Style ToggleButton - uEN Laboratory</title>
+  <meta name="author" content="uEN">
+  <link rel="author" href="humans.txt">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  
+    
+  
+  <meta name="description" content=" ViewModelで簡単にLOB開発できるようなソリューションを目指します。 ">
+  <meta name="keywords" content="uENLaboratory">
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://s-ueno.github.io/blog/2014/12/06/wpf-15/">
+  <link href="/favicon.png" rel="icon">
+  <link href='http://fonts.googleapis.com/css?family=Cantarell' rel='stylesheet' type='text/css'>
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="uEN Laboratory" type="application/atom+xml">
+  <meta name="og:type" content="website" />
+  <meta name="og:site_name" content="uEN Laboratory" />
+  <meta name="og:title" content="Modern Style ToggleButton" />
+  <meta name="og:description" content=" ViewModelで簡単にLOB開発できるようなソリューションを目指します。 " />
+  <meta name="og:url" content="http://s-ueno.github.io/blog/2014/12/06/wpf-15/"/>
+  <meta name="url" content="http://s-ueno.github.io/blog/2014/12/06/wpf-15/">
+  
+  <meta name="subject" content="wpf"/>
+  <meta name="category" content="wpf"/>
+  
+  <meta name="distribution" content="global">
+  <script src="/javascripts/libs/jquery/jquery-2.0.3.min.js"></script>
+
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+
+<script language="JavaScript">
+$(document).ready( function () {
+   $("a[href^='http']:not([href*='" + location.hostname + "'])").attr('target', '_blank');
+})
+</script>
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-54883059-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <nav role="navigation"><div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="/">uEN Laboratory</a>
+    <ul class="nav">
+
+      <li><a href="/blog/archives">Archives</a></li>
+    </ul>
+    <ul class="nav" data-subscription="rss">
+      <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+      
+    </ul>
+      
+    <form class="navbar-form" action="https://www.google.com/search" method="get">
+      <fieldset role="search">
+        <input type="hidden" name="q" value="site:s-ueno.github.io" />
+        <input class="span2" type="text" name="q" results="0" placeholder="Search"/>
+      </fieldset>
+    </form>
+      
+    
+  </div>
+</div>
+</nav>
+  <div class="wrapper_single">
+    <div class="container">
+      <div class="row">
+        <article class="span8 offset2" role="article">
+
+          <div class="article-format">
+
+  <header>
+    
+      
+        <h1 class="entry-title">Modern Style ToggleButton</h1>
+      
+    
+    
+      <p class="meta">
+        
+  
+
+
+  
+    <span class="byline author vcard">by <span class="fn">uEN</span></span>
+  
+
+ - 
+        
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+    <time datetime="2014-12-06T17:48:15+09:00" pubdate data-updated="true">
+        <span class='month'>Dec</span> <span class='day'>06</span> <span class='year'>2014</span>
+    </time>
+   - 
+        
+
+posted in
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/wpf/'>wpf</a>
+  
+</span>
+
+
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>CheckBox と RadioButton の Style を カスタマイズします。</p>
+
+<!-- more -->
+
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.checkbox.aspx">CheckBox</a> と <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.radiobutton.aspx">RadioButton</a> ですが その挙動に関しては異なりますが、外観に関しては
+Checked、Unchecked、Null の三つの状態とテキストをユーザーに表示するという点で
+同じように取り扱えます。</p>
+
+<p>そのため Style に関しては <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.primitives.togglebutton.aspx">ToggleButton</a> というベースクラスにキー名を設定して
+作成することも可能です。</p>
+
+<p>まずは、前回と同様に土台を取得するため VisualStudio のデザイナ上で
+ChekBox( もしくは RadioButton ) を右クリック ⇒ テンプレートの編集 ⇒ コピーして編集で生成される
+テンプレートを利用したいと思います。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-15-01.png" alt="wpf-15-01" /></p>
+
+<p>ちなみに FocusVisual は {x:null} で未設定とするので生成されるテンプレートからは外します。</p>
+
+<p>生成されたのがコレです。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Static.Background" Color="#FFFFFFFF"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Static.Border" Color="#FF707070"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.MouseOver.Background" Color="#FFF3F9FF"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.MouseOver.Border" Color="#FF5593FF"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.MouseOver.Glyph" Color="#FF212121"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Disabled.Background" Color="#FFE6E6E6"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Disabled.Border" Color="#FFBCBCBC"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Disabled.Glyph" Color="#FF707070"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Pressed.Background" Color="#FFD9ECFF"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Pressed.Border" Color="#FF3C77DD"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Pressed.Glyph" Color="#FF212121"/&gt;
+</span><span class='line'>&lt;SolidColorBrush x:Key="RadioButton.Static.Glyph" Color="#FF212121"/&gt;
+</span><span class='line'>&lt;Style TargetType="{x:Type RadioButton}"&gt;
+</span><span class='line'>    &lt;Setter Property="FocusVisualStyle" Value="{x:null}"/&gt;
+</span><span class='line'>    &lt;Setter Property="Background" Value="{StaticResource RadioButton.Static.Background}"/&gt;
+</span><span class='line'>    &lt;Setter Property="BorderBrush" Value="{StaticResource RadioButton.Static.Border}"/&gt;
+</span><span class='line'>    &lt;Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/&gt;
+</span><span class='line'>    &lt;Setter Property="BorderThickness" Value="1"/&gt;
+</span><span class='line'>    &lt;Setter Property="Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate TargetType="{x:Type RadioButton}"&gt;
+</span><span class='line'>                &lt;Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True"&gt;
+</span><span class='line'>                    &lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>                        &lt;ColumnDefinition Width="Auto"/&gt;
+</span><span class='line'>                        &lt;ColumnDefinition Width="*"/&gt;
+</span><span class='line'>                    &lt;/Grid.ColumnDefinitions&gt;
+</span><span class='line'>                    &lt;Border x:Name="radioButtonBorder" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="100" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="1,1,2,1" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"&gt;
+</span><span class='line'>                        &lt;Grid x:Name="markGrid" Margin="2"&gt;
+</span><span class='line'>                            &lt;Ellipse x:Name="optionMark" Fill="{StaticResource RadioButton.Static.Glyph}" MinWidth="6" MinHeight="6" Opacity="0"/&gt;
+</span><span class='line'>                        &lt;/Grid&gt;
+</span><span class='line'>                    &lt;/Border&gt;
+</span><span class='line'>                    &lt;ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/&gt;
+</span><span class='line'>                &lt;/Grid&gt;
+</span><span class='line'>                &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                    &lt;Trigger Property="HasContent" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="FocusVisualStyle" Value="{StaticResource OptionMarkFocusVisual}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="Padding" Value="4,-1,0,0"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsMouseOver" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Background}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.MouseOver.Border}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.MouseOver.Glyph}"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>                        &lt;Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Background}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Disabled.Border}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Disabled.Glyph}"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsPressed" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="Background" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Background}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="BorderBrush" TargetName="radioButtonBorder" Value="{StaticResource RadioButton.Pressed.Border}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="Fill" TargetName="optionMark" Value="{StaticResource RadioButton.Pressed.Glyph}"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsChecked" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="Opacity" TargetName="optionMark" Value="1"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsChecked" Value="{x:Null}"&gt;
+</span><span class='line'>                        &lt;Setter Property="Opacity" TargetName="optionMark" Value="0.56"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これをカスタマイズの元にして、最初に TargetType=&ldquo;{x:Type ToggleButton}&rdquo; とし
+CheckBox と RadioButton のベースのスタイルとして宣言します。</p>
+
+<p>また、お決まりの Background や Foreground を DynamicResource に変更します。</p>
+
+<p>次に生成されたテンプレートを見ると</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>    &lt;ColumnDefinition Width="Auto"/&gt;
+</span><span class='line'>    &lt;ColumnDefinition Width="*"/&gt;
+</span><span class='line'>&lt;/Grid.ColumnDefinitions&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>として、左側列にチェックマーク、右側列に可変のテキストエリアを用意しているのがわかります。</p>
+
+<p>今回は、RadioButton をベースクラスに利用しましたが、中身をみると Border の  CornerRadius=&ldquo;100&rdquo;
+として丸い境界を宣言し、さらにその中に <code>&lt;Ellipse</code> で 少し小さい丸を描いているのが
+わかります。</p>
+
+<p>たしかに、そんな外観をしています。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-15-02.png" alt="wpf-15-02" /></p>
+
+<p>チェックボックスだと、この角丸がなくなって四角になっているだけです。</p>
+
+<p>このままだと可愛げがないので、こんな形で</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-15-03.png" alt="wpf-15-03" /></p>
+
+<p>赤ペン先生みたいなアイコン(Designed by <a href="http://modernuiicons.com/">Alex Peattie</a> )をチェックマークに
+使ってみたいと思います。</p>
+
+<p>このとき普通に四角の中にジオメトリを描画するのではなく <code>Margin="2,-5,-2,2"</code> で
+四角の枠から右上にはみ出すようにすると、それっぽくなります。</p>
+
+<p>そんなこんなで、ToggleButton用のStyle は以下のようになりました。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Style x:Key="ToggleButtonBase" TargetType="{x:Type ToggleButton}"&gt;
+</span><span class='line'>    &lt;Setter Property="Background"       Value="Transparent"/&gt;
+</span><span class='line'>    &lt;Setter Property="Foreground"       Value="{DynamicResource AppForeground}"/&gt;
+</span><span class='line'>    &lt;Setter Property="BorderBrush"      Value="{DynamicResource ToggleButton.Static.Border}"/&gt;
+</span><span class='line'>    &lt;Setter Property="BorderThickness"  Value="1"/&gt;
+</span><span class='line'>    &lt;Setter Property="FocusVisualStyle" Value="{x:Null}"/&gt;
+</span><span class='line'>    &lt;Setter Property="Template"&gt;
+</span><span class='line'>        &lt;Setter.Value&gt;
+</span><span class='line'>            &lt;ControlTemplate TargetType="{x:Type ToggleButton}"&gt;
+</span><span class='line'>                &lt;Grid x:Name="templateRoot" Background="Transparent" SnapsToDevicePixels="True"&gt;
+</span><span class='line'>                    &lt;Grid.ColumnDefinitions&gt;
+</span><span class='line'>                        &lt;ColumnDefinition Width="Auto"/&gt;
+</span><span class='line'>                        &lt;ColumnDefinition Width="*"/&gt;
+</span><span class='line'>                    &lt;/Grid.ColumnDefinitions&gt;
+</span><span class='line'>                    &lt;Border x:Name="PART_Border" 
+</span><span class='line'>                            Width="25" Height="25" 
+</span><span class='line'>                            CornerRadius="{TemplateBinding Border.CornerRadius}"
+</span><span class='line'>                            BorderBrush="{TemplateBinding BorderBrush}" 
+</span><span class='line'>                            BorderThickness="{TemplateBinding BorderThickness}" 
+</span><span class='line'>                            Background="{TemplateBinding Background}" 
+</span><span class='line'>                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+</span><span class='line'>                            Margin="1,1,2,1" 
+</span><span class='line'>                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"&gt;
+</span><span class='line'>                        &lt;Grid&gt;
+</span><span class='line'>                            &lt;Viewbox Stretch="Fill" Margin="2,-5,-2,2"&gt;
+</span><span class='line'>                                &lt;Path Style="{DynamicResource PathButtonStyle}" x:Name="optionMark"
+</span><span class='line'>                                  Fill="{DynamicResource ToggleButton.Static.Glyph}"
+</span><span class='line'>                                  Opacity="0"
+</span><span class='line'>                                  Data="F1 M 23.7501,33.25L 34.8334,44.3333L 52.2499,22.1668L 56.9999,26.9168L 34.8334,53.8333L 19.0001,38L 23.7501,33.25 Z " /&gt;
+</span><span class='line'>                            &lt;/Viewbox&gt;
+</span><span class='line'>                            &lt;Viewbox Stretch="Fill" Margin="2"&gt;
+</span><span class='line'>                                &lt;Path Style="{DynamicResource PathButtonStyle}" x:Name="optionNullMark"
+</span><span class='line'>                                  Fill="{DynamicResource ToggleButton.Static.Glyph}"
+</span><span class='line'>                                  Opacity="0"
+</span><span class='line'>                                  Data="F1 M 31.6667,19L 44.3333,19L 57,31.6667L 57,44.3333L 44.3333,57L 31.6667,57L 19,44.3333L 19,31.6667L 31.6667,19 Z M 26.4762,45.0454L 30.9546,49.5238L 38,42.4783L 45.0454,49.5238L 49.5237,45.0454L 42.4783,38L 49.5238,30.9546L 45.0454,26.4763L 38,33.5217L 30.9546,26.4762L 26.4762,30.9546L 33.5217,38L 26.4762,45.0454 Z " /&gt;
+</span><span class='line'>                            &lt;/Viewbox&gt;
+</span><span class='line'>                        &lt;/Grid&gt;
+</span><span class='line'>                    &lt;/Border&gt;
+</span><span class='line'>                    &lt;ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" RecognizesAccessKey="True" 
+</span><span class='line'>                                      ContentTemplate="{TemplateBinding ContentTemplate}" 
+</span><span class='line'>                                      Content="{TemplateBinding Content}" 
+</span><span class='line'>                                      ContentStringFormat="{TemplateBinding ContentStringFormat}" 
+</span><span class='line'>                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+</span><span class='line'>                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+</span><span class='line'>                                      Margin="{TemplateBinding Padding}" 
+</span><span class='line'>                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+</span><span class='line'>                                      /&gt;
+</span><span class='line'>                &lt;/Grid&gt;
+</span><span class='line'>                &lt;ControlTemplate.Triggers&gt;
+</span><span class='line'>                    &lt;Trigger Property="HasContent" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="Padding" Value="4,-1,0,0"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsMouseOver" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="Background" TargetName="PART_Border" Value="{DynamicResource  ToggleButton.MouseOver.Background}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="BorderBrush" TargetName="PART_Border" Value="{DynamicResource ToggleButton.MouseOver.Border}"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsEnabled" Value="false"&gt;
+</span><span class='line'>                        &lt;Setter Property="Background" TargetName="PART_Border" Value="{DynamicResource ToggleButton.Disabled.Background}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="BorderBrush" TargetName="PART_Border" Value="{DynamicResource ToggleButton.Disabled.Border}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="Foreground" Value="{DynamicResource ToggleButton.Disabled.Foreground}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="Fill" TargetName="optionMark" Value="{DynamicResource ToggleButton.Disabled.Glyph}"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsPressed" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="Background" TargetName="PART_Border" Value="{DynamicResource ToggleButton.Pressed.Background}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="BorderBrush" TargetName="PART_Border" Value="{DynamicResource ToggleButton.Pressed.Border}"/&gt;
+</span><span class='line'>                        &lt;Setter Property="Opacity" TargetName="optionMark" Value="0.2"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsChecked" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="Opacity" TargetName="optionMark" Value="1"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsChecked" Value="{x:Null}"&gt;
+</span><span class='line'>                        &lt;Setter Property="Opacity" TargetName="optionNullMark" Value="1"/&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                    &lt;Trigger Property="IsFocused" Value="true"&gt;
+</span><span class='line'>                        &lt;Setter Property="BorderBrush" TargetName="PART_Border" Value="{DynamicResource ToggleButton.Focus.Border}" /&gt;
+</span><span class='line'>                    &lt;/Trigger&gt;
+</span><span class='line'>                &lt;/ControlTemplate.Triggers&gt;
+</span><span class='line'>            &lt;/ControlTemplate&gt;
+</span><span class='line'>        &lt;/Setter.Value&gt;
+</span><span class='line'>    &lt;/Setter&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>面白いのが RadioButton と CheckBox の外観に関しては
+RadioButtonの場合だけ、角を丸く円のようにするだけの差しかなくてもソレっぽくなるところです。</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Style TargetType="{x:Type CheckBox}"       BasedOn="{StaticResource ToggleButtonBase}" /&gt;
+</span><span class='line'>&lt;Style TargetType="{x:Type RadioButton}"    BasedOn="{StaticResource ToggleButtonBase}" &gt;
+</span><span class='line'>    &lt;Setter Property="Border.CornerRadius" Value="45" /&gt;
+</span><span class='line'>&lt;/Style&gt;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>そこをあえて、まったく異なるスタイルにして、スイッチみたいなデザインを
+採用してみるのも面白いかもしれません。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-15-04.png" alt="wpf-15-04" /></p>
+
+<hr />
+</div>
+
+
+
+
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+
+  
+    <span class="byline author vcard">by <span class="fn">uEN</span></span>
+  
+
+ - 
+      
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+    <time datetime="2014-12-06T17:48:15+09:00" pubdate data-updated="true">
+        <span class='month'>Dec</span> <span class='day'>06</span> <span class='year'>2014</span>
+    </time>
+   - 
+      
+
+posted in
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/wpf/'>wpf</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://s-ueno.github.io/blog/2014/12/06/wpf-15/" data-via="" data-counturl="http://s-ueno.github.io/blog/2014/12/06/wpf-15/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+
+
+
+
+</div>
+
+    
+    
+      <a class="pull-left" href="/blog/2014/12/02/wpf-14/" title="Previous Post: Modern Style TextBox">&laquo; Modern Style TextBox</a>
+    
+    
+  </footer>
+
+</div>
+
+
+
+
+
+          
+            <div class="article-format">
+              <h1>Comments</h1>
+              <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+            </div>
+          
+
+
+
+
+
+        </article>
+      </div>
+    </div>
+  </div>
+  <div id="footer-widgets">
+  <div class="container">
+    <div class="row">
+  <div class="span5">
+    <h2>recent posts</h2>
+    <ul class="recent_posts">
+      
+        <li>
+          <a href="/blog/2014/12/06/wpf-15/">Modern Style ToggleButton</a>
+        </li>
+      
+        <li>
+          <a href="/blog/2014/12/02/wpf-14/">Modern Style TextBox</a>
+        </li>
+      
+        <li>
+          <a href="/blog/2014/11/29/wpf-13/">WPF パンくずリストで画面遷移</a>
+        </li>
+      
+        <li>
+          <a href="/blog/2014/11/27/wpf-12/">jekyll の Paginate が仕事しない</a>
+        </li>
+      
+        <li>
+          <a href="/blog/2014/11/25/wpf-11/">MEF で優先度を設けて取得できないか</a>
+        </li>
+      
+    </ul>
+    <h2><a href="/blog/archives">archives</a></h2>
+  </div>
+
+  <div class="span3">
+    <h2>category</h2>
+    <ul id="category-list"><li><a href='/blog/categories/jekyll-paginate/'>jekyll-paginate (1)</a></li><li><a href='/blog/categories/mef/'>mef (1)</a></li><li><a href='/blog/categories/wpf/'>wpf (12)</a></li><li><a href='/blog/categories/dezain/'>デザイン (1)</a></li></ul>
+  </div>
+
+
+  <div class="span3">
+    
+
+  </div>
+  <div class="span4">
+    
+
+  </div>
+</div>
+
+  </div>
+</div>
+<footer class="footer">
+
+
+
+
+
+  <div class="container">
+
+
+
+
+    <p class="pull-left">
+  <a href="/">uEN Laboratory</a>
+  - Copyright &copy; 2014 - uEN
+</p>
+<p class="pull-right">
+  <span>Powered by <a href="http://octopress.org/">Octopress</a>.</span>
+  
+    <span>Designed by <a href="http://www.AdrianArtiles.com">Adrian Artiles</a>.</span>
+  
+</p>
+
+  </div>
+</footer>
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+<script>window.jQuery || document.write('<script src="/javascripts/libs/jquery-1.7.2.min.js" type="text/javascript"><\/script>')</script>
+<script src="/javascripts/libs/bootstrap.min.js" type="text/javascript"></script>
+<script src="/javascripts/jquery.tweet.js" type="text/javascript"></script>
+<script src="/javascripts/jquery.instagram.js" type="text/javascript"></script>
+<script src="/javascripts/libs/jquery.masonry.min.js" type="text/javascript"></script>
+<script src="/javascripts/custom.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'uenlaboratory';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://s-ueno.github.io%2Fblog%2F2014%2F12%2F06%2Fwpf-15%2F';
+        var disqus_url = 'http://s-ueno.github.io%2Fblog%2F2014%2F12%2F06%2Fwpf-15%2F';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+</body>
+</html>
