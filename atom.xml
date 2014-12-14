@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-12-06T17:50:35+09:00</updated>
+  <updated>2014-12-14T20:08:48+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,70 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Modern Style ComboBox]]></title>
+    <link href="http://s-ueno.github.io/blog/2014/12/14/wpf-16/"/>
+    <updated>2014-12-14T20:06:57+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2014/12/14/wpf-16</id>
+    <content type="html"><![CDATA[<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.combobox.aspx">ComboBox</a> は <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a> 派生なので、コンテナとして自分自身のスタイル
+が一つと、その中にある一つ一つの項目に対しての <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.comboboxitem.aspx">ComboBoxItem</a> スタイル
+この二つで いつものコンボボックス になります。</p>
+
+<!-- more -->
+
+
+<p>さらに、コンテナは 右にボタンを持ち、クリックすればドロップダウンが表示され
+プロパティの設定によっては、編集可能なTextBoxとして機能することもできます。</p>
+
+<p>では、いつものように VisualStudio のデザイナ上で
+右クリック ⇒ テンプレートの編集 ⇒ コピーして編集
+でテンプレートを取得・・・してもいいのですが、そうすると
+一つ問題が出てきます。</p>
+
+<p>自動生成する Template が現在適用されているWPFのテーマにそぐうための
+アセンブリを強制的に参照することです。</p>
+
+<p>こんな風に</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" </span></code></pre></td></tr></table></div></figure>
+
+
+<p>回避する方法は、アセンブリを配布するとかGuidレベルの参照に変えるとかいろいろ
+あるのですが、テキストボックス、ボタン、ドロップダウンで構成される
+ただの便利コントロールに外部アセンブリを一つ追加するまでもありません。</p>
+
+<p>ただ、いちから作成するのも大変なので MSDN が提供してくれる土台を
+利用してみたいと思います。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms752094.aspx">ComboBox のスタイルとテンプレート</a></p>
+
+<blockquote><p>サンプル全体については、 「ControlTemplate を使用したスタイル設定のサンプル」を参照してください。.</p></blockquote>
+
+<p>ここから取得します。</p>
+
+<p>テンプレートやStyleをカスタマイズする開発者には垂涎もののサンプルです。</p>
+
+<p>WPF組み込みコントロールは、どうしても .Net Framework の都合によるもの
+が出てくるので、そういったものを考えた上で提供してくれるStyleはありがたいです。</p>
+
+<p>ここから ComboBox のベースとなるStyleを利用したいと思います。</p>
+
+<p>このMSDNサンプルが提供してくれるノイズのない情報を有効に利用したいと思います。</p>
+
+<p>ですが！
+本業の都合で、最近は家路につくのが日が変わっていて、ブログの更新の
+ための時間が取れにくくなっています(涙)</p>
+
+<p>この状況には、今年限りで決着を付けたいと考えています。</p>
+
+<p>12月はほそぼそと更新することになりそうですが、新年からは
+しっかりと情報を発信できればと思います。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Modern Style ToggleButton]]></title>

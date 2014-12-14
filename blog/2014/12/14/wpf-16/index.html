@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>jekyll の Paginate が仕事しない - uEN Laboratory</title>
+  <title>Modern Style ComboBox - uEN Laboratory</title>
   <meta name="author" content="uEN">
   <link rel="author" href="humans.txt">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -21,20 +21,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://s-ueno.github.io/blog/2014/11/27/wpf-12/">
+  <link rel="canonical" href="http://s-ueno.github.io/blog/2014/12/14/wpf-16/">
   <link href="/favicon.png" rel="icon">
   <link href='http://fonts.googleapis.com/css?family=Cantarell' rel='stylesheet' type='text/css'>
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="uEN Laboratory" type="application/atom+xml">
   <meta name="og:type" content="website" />
   <meta name="og:site_name" content="uEN Laboratory" />
-  <meta name="og:title" content="jekyll の Paginate が仕事しない" />
+  <meta name="og:title" content="Modern Style ComboBox" />
   <meta name="og:description" content=" ViewModelで簡単にLOB開発できるようなソリューションを目指します。 " />
-  <meta name="og:url" content="http://s-ueno.github.io/blog/2014/11/27/wpf-12/"/>
-  <meta name="url" content="http://s-ueno.github.io/blog/2014/11/27/wpf-12/">
+  <meta name="og:url" content="http://s-ueno.github.io/blog/2014/12/14/wpf-16/"/>
+  <meta name="url" content="http://s-ueno.github.io/blog/2014/12/14/wpf-16/">
   
-  <meta name="subject" content="jekyll-paginate"/>
-  <meta name="category" content="jekyll-paginate"/>
+  <meta name="subject" content="wpf"/>
+  <meta name="category" content="wpf"/>
   
   <meta name="distribution" content="global">
   <script src="/javascripts/libs/jquery/jquery-2.0.3.min.js"></script>
@@ -102,7 +102,7 @@ $(document).ready( function () {
   <header>
     
       
-        <h1 class="entry-title">Jekyll の Paginate が仕事しない</h1>
+        <h1 class="entry-title">Modern Style ComboBox</h1>
       
     
     
@@ -129,10 +129,10 @@ $(document).ready( function () {
 
 
 
-  
 
-    <time datetime="2014-11-28T16:32:40+09:00" class="updated">
-        Updated <span class='month'>Nov</span> <span class='day'>28</span> <span class='year'>2014</span>
+
+    <time datetime="2014-12-14T20:06:57+09:00" pubdate data-updated="true">
+        <span class='month'>Dec</span> <span class='day'>14</span> <span class='year'>2014</span>
     </time>
    - 
         
@@ -140,7 +140,7 @@ $(document).ready( function () {
 posted in
 <span class="categories">
   
-    <a class='category' href='/blog/categories/jekyll-paginate/'>jekyll-paginate</a>
+    <a class='category' href='/blog/categories/wpf/'>wpf</a>
   
 </span>
 
@@ -153,44 +153,62 @@ posted in
   </header>
 
 
-  <div class="entry-content"><p>jekyll-paginate が仕事しない事にここ数日悩まされました&hellip;</p>
+  <div class="entry-content"><p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.combobox.aspx">ComboBox</a> は <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.itemscontrol.aspx">ItemsControl</a> 派生なので、コンテナとして自分自身のスタイル
+が一つと、その中にある一つ一つの項目に対しての <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.comboboxitem.aspx">ComboBoxItem</a> スタイル
+この二つで いつものコンボボックス になります。</p>
 
 <!-- more -->
 
 
-<p>WPF でパンくずリストを画面遷移に採用したのを執筆したかったのですが
-(git 上は開発ブランチからメイン トランクにリリースしました。)
-本業で3連休つぶれるし jekyll-paginate が仕事しないし、散々でした。</p>
+<p>さらに、コンテナは 右にボタンを持ち、クリックすればドロップダウンが表示され
+プロパティの設定によっては、編集可能なTextBoxとして機能することもできます。</p>
 
-<p>_config.yml で</p>
+<p>では、いつものように VisualStudio のデザイナ上で
+右クリック ⇒ テンプレートの編集 ⇒ コピーして編集
+でテンプレートを取得・・・してもいいのですが、そうすると
+一つ問題が出てきます。</p>
+
+<p>自動生成する Template が現在適用されているWPFのテーマにそぐうための
+アセンブリを強制的に参照することです。</p>
+
+<p>こんな風に</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>
-</span><span class='line'>paginate: 10 
-</span><span class='line'>paginate_path: "posts/:num"
-</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class=''><span class='line'>xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2" </span></code></pre></td></tr></table></div></figure>
 
 
-<p>と、宣言するとページネーターが 10 記事より過去の記事を 前のページ みたいに
-自動生成してくれるハズだったのですが、これが0Byteのファイルしかできなくて（涙）</p>
+<p>回避する方法は、アセンブリを配布するとかGuidレベルの参照に変えるとかいろいろ
+あるのですが、テキストボックス、ボタン、ドロップダウンで構成される
+ただの便利コントロールに外部アセンブリを一つ追加するまでもありません。</p>
 
-<p>原因は plugins の category_generator.rb と tag_generator.rb だとわかったのですが
-解決の方向性を誤りまして・・・。</p>
+<p>ただ、いちから作成するのも大変なので MSDN が提供してくれる土台を
+利用してみたいと思います。</p>
 
-<p>なんとか、ジェネレートできないかgemのバージョンやjekyllのrubyのソースにバグがないかとか
-index.htmlの構文誤りがないかとか、あさっての方向に全力疾走しまして。</p>
+<p><a href="http://msdn.microsoft.com/ja-jp/library/ms752094.aspx">ComboBox のスタイルとテンプレート</a></p>
 
-<p>無駄に3夜ほど費やしました。</p>
+<blockquote><p>サンプル全体については、 「ControlTemplate を使用したスタイル設定のサンプル」を参照してください。.</p></blockquote>
 
-<p>原因わかってるなら、問題のプラグインをrb.bkか何かにリネームしてページネーターが
-ジェネレートした過去記事用のHTMLだけ git にチェックインすればいいのでは？</p>
+<p>ここから取得します。</p>
 
-<p>と気づいたのが今日でした。
-それでうまくいったのですが、別のStyleではどうかとテストしてみたところ、またダメでした。</p>
+<p>テンプレートやStyleをカスタマイズする開発者には垂涎もののサンプルです。</p>
 
-<p>種々のバグ修正しながら、これは ruby を写経しなさいとの啓示かもしれません。</p>
+<p>WPF組み込みコントロールは、どうしても .Net Framework の都合によるもの
+が出てくるので、そういったものを考えた上で提供してくれるStyleはありがたいです。</p>
+
+<p>ここから ComboBox のベースとなるStyleを利用したいと思います。</p>
+
+<p>このMSDNサンプルが提供してくれるノイズのない情報を有効に利用したいと思います。</p>
+
+<p>ですが！
+本業の都合で、最近は家路につくのが日が変わっていて、ブログの更新の
+ための時間が取れにくくなっています(涙)</p>
+
+<p>この状況には、今年限りで決着を付けたいと考えています。</p>
+
+<p>12月はほそぼそと更新することになりそうですが、新年からは
+しっかりと情報を発信できればと思います。</p>
+
+<hr />
 </div>
 
 
@@ -222,10 +240,10 @@ index.htmlの構文誤りがないかとか、あさっての方向に全力疾�
 
 
 
-  
 
-    <time datetime="2014-11-28T16:32:40+09:00" class="updated">
-        Updated <span class='month'>Nov</span> <span class='day'>28</span> <span class='year'>2014</span>
+
+    <time datetime="2014-12-14T20:06:57+09:00" pubdate data-updated="true">
+        <span class='month'>Dec</span> <span class='day'>14</span> <span class='year'>2014</span>
     </time>
    - 
       
@@ -233,7 +251,7 @@ index.htmlの構文誤りがないかとか、あさっての方向に全力疾�
 posted in
 <span class="categories">
   
-    <a class='category' href='/blog/categories/jekyll-paginate/'>jekyll-paginate</a>
+    <a class='category' href='/blog/categories/wpf/'>wpf</a>
   
 </span>
 
@@ -242,7 +260,7 @@ posted in
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://s-ueno.github.io/blog/2014/11/27/wpf-12/" data-via="" data-counturl="http://s-ueno.github.io/blog/2014/11/27/wpf-12/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://s-ueno.github.io/blog/2014/12/14/wpf-16/" data-via="" data-counturl="http://s-ueno.github.io/blog/2014/12/14/wpf-16/" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -258,10 +276,8 @@ posted in
 
     
     
-      <a class="pull-left" href="/blog/2014/11/25/wpf-11/" title="Previous Post: MEF で優先度を設けて取得できないか">&laquo; MEF で優先度を設けて取得できないか</a>
+      <a class="pull-left" href="/blog/2014/12/06/wpf-15/" title="Previous Post: Modern Style ToggleButton">&laquo; Modern Style ToggleButton</a>
     
-    
-      <a class="pull-right" href="/blog/2014/11/29/wpf-13/" title="Next Post: WPF パンくずリストで画面遷移">WPF パンくずリストで画面遷移 &raquo;</a>
     
   </footer>
 
@@ -375,8 +391,8 @@ posted in
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://s-ueno.github.io%2Fblog%2F2014%2F11%2F27%2Fwpf-12%2F';
-        var disqus_url = 'http://s-ueno.github.io%2Fblog%2F2014%2F11%2F27%2Fwpf-12%2F';
+        var disqus_identifier = 'http://s-ueno.github.io%2Fblog%2F2014%2F12%2F14%2Fwpf-16%2F';
+        var disqus_url = 'http://s-ueno.github.io%2Fblog%2F2014%2F12%2F14%2Fwpf-16%2F';
         var disqus_script = 'embed.js';
       
     (function () {
