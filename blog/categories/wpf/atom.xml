@@ -4,7 +4,7 @@
   <title><![CDATA[Category: wpf | uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/blog/categories/wpf/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2014-12-14T20:08:48+09:00</updated>
+  <updated>2015-02-26T08:24:10+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,207 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Modern Style ComboBox 2]]></title>
+    <link href="http://s-ueno.github.io/blog/2015/02/26/wpf-17/"/>
+    <updated>2015-02-26T08:23:15+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2015/02/26/wpf-17</id>
+    <content type="html"><![CDATA[<p><a href="http://msdn.microsoft.com/ja-jp/library/ms752094.aspx">ComboBox のスタイルとテンプレート</a></p>
+
+<p>を参考にして、コンボボックスのスタイルをカスタマイズします。</p>
+
+<!-- more -->
+
+
+<p>MSDN が提供するテンプレートのサンプル ControlTemplateExamples をダウンロードし
+中身を確認します。</p>
+
+<p>Resources フォルダに各種の論理コンテンツ(Button.xaml、Calendar.xaml、CheckBox.xaml・・・)
+の <a href="http://msdn.microsoft.com/ja-jp/library/hh968442.aspx">ResourceDictionary</a> が整理されています。</p>
+
+<p>今回は ComboBox.xaml です。</p>
+
+<p>一度にXamlコードを読み解こうよすると怯んでしまうので VisualStudio のエディタ機能を利用して、整理しながら確認します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-01.png" alt="wpf-17-01" /></p>
+
+<p>上から解析します。</p>
+
+<pre><code>  &lt;ResourceDictionary.MergedDictionaries&gt;
+    &lt;ResourceDictionary Source="Shared.xaml" /&gt;
+  &lt;/ResourceDictionary.MergedDictionaries&gt;
+</code></pre>
+
+<p>Shared.xamlは、このシリーズで作成している uEN CSプロジェクト と同じで、色などの共通的なものを
+一元管理しているリソースです。</p>
+
+<p>ただし、DynamicResourceとして参照する場合はこのように参照を入れる必要はなく、StaticResourceで参照
+する必要がある場合に利用します。</p>
+
+<p>さて、二つのコントロール テンプレートと二つのStyleから構成されていることがわかります。</p>
+
+<ul>
+<li><code>&lt;ControlTemplate x:Key="ComboBoxToggleButton"</code></li>
+<li><code>&lt;ControlTemplate x:Key="ComboBoxTextBox"</code></li>
+<li><code>&lt;Style x:Key="{x:Type ComboBox}"</code></li>
+<li><code>&lt;Style x:Key="{x:Type ComboBoxItem}"</code></li>
+</ul>
+
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-02.png" alt="wpf-17-02" /></p>
+
+<p>これらのStyleおよびテンプレートを ComboBox の Style として組み合わせています。</p>
+
+<h2>コントロールのコントラクト</h2>
+
+<p>ComboBox の Xaml は興味深く <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.combobox.iseditable.aspx">ComboBox.IsEditable</a> プロパティを真に設定した場合に、自身のTemplateを変えて
+ComboBoxTextBox が表示されるようにしています。</p>
+
+<p>プロパティの変更によって、Styleを書き換える方法は</p>
+
+<pre><code> &lt;ControlTemplate.Triggers&gt;
+     &lt;Trigger Property="IsEnabled" Value="false"&gt;
+         &lt;Setter Property="Foreground" Value="{DynamicResource AppForegroundDisabled}"/&gt;
+         &lt;Setter Property="Background" Value="{DynamicResource AppDisabled}"/&gt;
+     &lt;/Trigger&gt;
+</code></pre>
+
+<p>にように適用してきました。</p>
+
+<p>もちろん ComboBoxも 同じ方法で実現できますが、こちらは <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.visualstatemanager.aspx">VisualStateManager</a> を利用して実現しています。</p>
+
+<p>MSDNの <a href="http://msdn.microsoft.com/ja-jp/library/ee230084.aspx#customizing_other_controls_by_understanding_the_control_contract">コントロール コントラクトについて</a> に詳細が記述しています。</p>
+
+<blockquote><p>ControlTemplate  を使用して、その視覚的な構造 (FrameworkElement オブジェクトを使用) および視覚的な動作 (VisualState オブジェクトを使用) を指定する</p></blockquote>
+
+<p>提供するコンテンツのルール(契約)定義のようなもので、そのルールの周知方法はクラスの属性値から確認できます。
+たとえば <a href="http://msdn.microsoft.com/ja-jp/library/system.windows.controls.combobox.aspx">ComboBox</a> をみると</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-03.png" alt="wpf-17-03" /></p>
+
+<p>のように、PART_EditableTextBox という名前でテキストボックスを公開しています。
+開発者は、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.templatepartattribute.aspx">TemplatePartAttribute</a>属性から名称を取得してTemplateからStyleをカスタマイズすることができます。</p>
+
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.visualstatemanager.aspx">VisualStateManager</a> も同様で、コントロールの視覚的な動作の契約書みたいなもので、それを属性として宣言することで
+開発者にカスタマイズ可能なことを公開します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-04.png" alt="wpf-17-04" /></p>
+
+<p>.Net Framework内部でも一貫して適用していればこのコントラクトも一級品として利用すると思うのですが、
+<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.templatepartattribute.aspx">TemplatePartAttribute</a>の厳密さに比べて、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.templatevisualstateattribute.aspx">TemplateVisualStateAttribute</a>で
+コントラクトを示しているクラスは少ないような気がします。</p>
+
+<p>今回StyleをカスタマイズするComboBox.xamlですが、この動作を実際に実装しているComboBox.csクラスでは</p>
+
+<pre><code>internal override void ChangeVisualState(bool useTransitions)
+{
+    if (!base.IsEnabled)
+    {
+        VisualStateManager.GoToState(this, "Disabled", useTransitions);
+    }
+</code></pre>
+
+<p>のように、VisualStateManagerを利用しているのですが、このコントラクトは非公開です。</p>
+
+<p>ただ、<a href="http://msdn.microsoft.com/ja-jp/library/ms752094.aspx">ComboBox のスタイルとテンプレート</a>の記事でComboBoxの状態の表を公開していますし
+VisualStateManager を利用してカスタマイズする方法を踏襲します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-05.png" alt="wpf-17-05" /></p>
+
+<h2>ComboBoxのStyle</h2>
+
+<p>全体構成を担う <code>&lt;Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}"&gt;</code> と通して確認します。
+ただ、MSが提供しているコントロール テンプレート サンプルは少しだけおかしな箇所があるので、見直しながら確認していきます。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-06.png" alt="wpf-17-06" /></p>
+
+<p>まずはいつも通り、TemplateをControlTemplateを利用してカスタマイズしてくのですが</p>
+
+<pre><code>&lt;Setter Property="Template"&gt;
+    &lt;Setter.Value&gt;
+        &lt;ControlTemplate TargetType="{x:Type ComboBox}"&gt;
+            &lt;Grid&gt;
+</code></pre>
+
+<p>気になる点として、 <code>&lt;Grid.ColumnDefinitions&gt;</code> のように、レイアウトを区切る宣言がありません。
+しかし、ToggleButtonの属性にGrid.Column=&ldquo;2&#8221;と宣言しています。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-07.png" alt="wpf-17-07" /></p>
+
+<p>Templateのサンプルを初めにデザインした際に
+フレキシブルレイアウトとして、ドロップダウンボタンを
+Grid右端に表示するように配置したかったのかもしれません。</p>
+
+<p>（ただし、GridをColumnDefinitionを利用して区切っていないので、この指定は無効です）</p>
+
+<p>私も当初は、Templateをもとにそのようなレイアウト構成を考えていました。</p>
+
+<p>ただ、ComboBox のユーザビリティは昔から踏襲してきた独特の&#8221;クセ&#8221;があり
+実現する際に少し工夫が必要でした。</p>
+
+<p>MSサンプルを基に工夫について確認します。</p>
+
+<p>Editableモードによって、選択可能なテキストボックスとして機能するパターンと
+編集不可のリストボックスとして機能するパターンで、Zオーダーを意識したフォーカス制御や
+罫線描画などを考慮する必要があります。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-10.png" alt="wpf-17-10" /></p>
+
+<p>一見すると、右側にボタンがあるだけにみえますが、編集不可の場合はどこをクリックしても
+ドロップダウンのポップアップが起動します。</p>
+
+<p>これは右側だけではなくて、ボタン要素が全体にかかって配置されているからです。</p>
+
+<p>メインコンテンツを確認します。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-09.png" alt="wpf-17-09" /></p>
+
+<p><code>&lt;ControlTemplate TargetType="{x:Type ComboBox}"&gt;</code> から続くコンテンツがコンボボックスの
+実態になります。</p>
+
+<p>VisualStateManagerの後に続いて、ToggleButton、ContentPresenter（IsHitTestVisible=&ldquo;False&#8221;）、
+TextBox　と宣言されています。</p>
+
+<p>この宣言の順序も重要で、ToggleButtonの上にContentPresenter、その上にTextBoxが重なる事になります。
+ContentPresenter はヒットテストが無効になっており、ここをクリックした場合はその下のToggleButtonが
+反応するようになっています。</p>
+
+<p>なので、一見するとボタンに見えない箇所をクリックしてもポップアップが起動します。</p>
+
+<p>Editableモードの時はもう少し複雑です。</p>
+
+<p><img src="http://s-ueno.github.io/images/wpf-17-08.png" alt="wpf-17-08" /></p>
+
+<p>PART_EditableTextBox というName属性の <a href="https://msdn.microsoft.com/ja-jp/library/system.windows.controls.textbox.aspx">TextBox</a> が重なるように配置されています。
+TextBoxのVisibilityはHiddenで初期化されており、デフォルトでは表示されていない状態です。</p>
+
+<p>Visibility は VisualStateManager によって制御され、VisualStateがEditableの状態の場合に Visibility.Visible となります。</p>
+
+<p>VisualState 値は上述で記載したように、.Net Frameworkの ComboBoxクラス内部で <code>internal override void ChangeVisualState</code>
+として実装しており、IsEditable  プロパティが true であるときに変化するようになっています。</p>
+
+<p>これらの文字列は MSDN上で公開されています。</p>
+
+<p>最後に Popup が 配置され、<code>IsOpen="{TemplateBinding IsDropDownOpen}"</code> としてドロップボタンを押下するタイミングで
+リストを表示します。</p>
+
+<p>MSDNのサンプルではName属性が <code>x:Name="Popup"</code> となっていて、コントラクトに従っていないので、ここは
+PART_Popup という名にしたいと思います。</p>
+
+<p>コンボボックスの罫線は、一番上に配置されているToggleButtonのTemplate上で実装されています。</p>
+
+<p>しかし、.Net Frameworkが組み込みで提供するWPFのコンボボックスの外観も、
+実態はとても単純な要素を組み合わせることで
+表現できていることが確認でき、改めてWPFの強力かつ柔軟さを感じます。</p>
+
+<p>配色などを考えてカスタマイズしたサンプルをGit上にあげました。</p>
+
+<p>次回は別の要素か、テキストの制御などを考えています。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Modern Style ComboBox]]></title>
@@ -486,80 +687,6 @@ ContentControl の実体は ContentPresenter という、シンプルな名前�
 <a href="https://github.com/s-ueno/uENLab" rel="tooltip" title="uENLab">
   <img class="social_icon" alt="github icon" src="http://s-ueno.github.io/images/glyphicons_381_github.png">
 </a></p>
-
-<hr />
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ダイアログ メッセージのデザイン - WPF Vol 09]]></title>
-    <link href="http://s-ueno.github.io/blog/2014/11/20/wpf-10/"/>
-    <updated>2014-11-20T20:28:15+09:00</updated>
-    <id>http://s-ueno.github.io/blog/2014/11/20/wpf-10</id>
-    <content type="html"><![CDATA[<p>ストア アプリ風のダイアログ メッセージ を作成しました。<br/>
-もちろん、アニメーションします。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-10-01.png" alt="wpf-10-01" /></p>
-
-<!-- more -->
-
-
-<p>これも、いつもの如くまずはグリッド デザインから始まります。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-10-02.png" alt="wpf-10-02" /></p>
-
-<p>ちなみに図（と、デザイン）は<a href="http://msdn.microsoft.com/ja-jp/jj984295">ココ</a>です。<br/>
-(XPS で配布しなさいよ!!@心の声)</p>
-
-<p>Windows 8.1 UX ガイドライン というのが、どこかにあると思います。</p>
-
-<p>さて、話を戻すとWindowのデフォルトStyle上で、グリッドを比率設定してデザインしました。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-10-03.png" alt="wpf-10-03" /></p>
-
-<pre><code>&lt;Grid.RowDefinitions&gt;
-    &lt;RowDefinition Height="2*" /&gt;
-    &lt;RowDefinition Height="auto" /&gt;
-    &lt;RowDefinition Height="2*" /&gt;
-&lt;/Grid.RowDefinitions&gt;
-</code></pre>
-
-<p>作業手順ですが、今回のように具体的な図を基にする場合は、Excelにイメージを張り付けた後にセルの数を数えて、6個、3個、6個で比率だと 2対1対2 だね、という大雑把に設定しています。</p>
-
-<p>次に、真ん中のメッセージタイトル、メッセージ内容、ボタンを大まかに区切っていきます。</p>
-
-<pre><code>&lt;Grid.ColumnDefinitions&gt;
-    &lt;ColumnDefinition Width="*" /&gt;
-    &lt;ColumnDefinition Width="3*" /&gt;
-    &lt;ColumnDefinition Width="*" /&gt;
-&lt;/Grid.ColumnDefinitions&gt;
-</code></pre>
-
-<p>あとは、このVisibilityをVisibleにすると同時にアニメーションすれば完成です。
-ちなみにこれを呼び出す側はViewModelに用意した拡張メソッドをCallするだけです。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-10-04.png" alt="wpf-10-04" /></p>
-
-<p>今回のポイントは<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.input.keyboardnavigation.aspx">KeyboardNavigation</a> クラスを利用した各種添付プロパティです。</p>
-
-<p><img src="http://s-ueno.github.io/images/wpf-10-05.png" alt="wpf-10-05" /></p>
-
-<p>メッセージ ダイアログなので、デフォルトでフォーカスがあたるボタンがあります。<br/>
-この時にボタン以外にフォーカスが当たると困ります。</p>
-
-<p>MSDNを見ると</p>
-
-<blockquote><p>KeyboardNavigation  クラスは、ナビゲーション キーのいずれかが押されたときに、既定のキーボード フォーカスのナビゲーションを実装します。 ナビゲーション キーとは、Tab、Shift + Tab、Ctrl + Tab、Ctrl + Shift + Tab、上方向、下方向、左方向、および右方向の各キーを指します。</p></blockquote>
-
-<p>とあります。</p>
-
-<p>これらのキーを押してもボタン群だけフォーカスが当たるように添付プロパティを設定しています。</p>
-
-<p>いつものごとく、サンプル成果物はGit管理で。</p>
-
-<p><a href="https://github.com/s-ueno/uENLab">@s-ueno/uENLab</a> on GitHub</p>
-
-<p>次回は画面遷移を考えてみます。</p>
 
 <hr />
 ]]></content>
