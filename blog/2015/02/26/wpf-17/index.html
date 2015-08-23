@@ -237,7 +237,7 @@ ComboBoxTextBox が表示されるようにしています。</p>
 <p>のように、PART_EditableTextBox という名前でテキストボックスを公開しています。
 開発者は、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.templatepartattribute.aspx">TemplatePartAttribute</a>属性から名称を取得してTemplateからStyleをカスタマイズすることができます。</p>
 
-<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.visualstatemanager.aspx">VisualStateManager</a> も同様で、コントロールの視覚的な動作の契約書みたいなもので、それを属性として宣言することで
+<p><a href="http://msdn.microsoft.com/ja-jp/library/system.windows.templatevisualstateattribute.aspx">TemplateVisualStateAttribute</a> も同様で、コントロールの視覚的な動作の契約書みたいなもので、それを属性として宣言することで
 開発者にカスタマイズ可能なことを公開します。</p>
 
 <p><img src="http://s-ueno.github.io/images/wpf-17-04.png" alt="wpf-17-04" /></p>
@@ -263,7 +263,7 @@ ComboBoxTextBox が表示されるようにしています。</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>のように、VisualStateManagerを利用しているのですが、このコントラクトは非公開です。</p>
+<p>のように、<a href="http://msdn.microsoft.com/ja-jp/library/system.windows.visualstatemanager.aspx">VisualStateManager</a> を利用しているのですが、このコントラクトは非公開です。</p>
 
 <p>ただ、<a href="http://msdn.microsoft.com/ja-jp/library/ms752094.aspx">ComboBox のスタイルとテンプレート</a>の記事でComboBoxの状態の表を公開していますし
 VisualStateManager を利用してカスタマイズする方法を踏襲します。</p>
@@ -435,6 +435,8 @@ posted in
       <a class="pull-left" href="/blog/2014/12/14/wpf-16/" title="Previous Post: Modern Style ComboBox">&laquo; Modern Style ComboBox</a>
     
     
+      <a class="pull-right" href="/blog/2015/08/23/wpf-18/" title="Next Post: WPF DataGridの自動生成">WPF DataGridの自動生成 &raquo;</a>
+    
   </footer>
 
 </div>
@@ -467,6 +469,10 @@ posted in
     <ul class="recent_posts">
       
         <li>
+          <a href="/blog/2015/08/23/wpf-18/">WPF DataGridの自動生成</a>
+        </li>
+      
+        <li>
           <a href="/blog/2015/02/26/wpf-17/">Modern Style ComboBox 2</a>
         </li>
       
@@ -482,17 +488,13 @@ posted in
           <a href="/blog/2014/12/02/wpf-14/">Modern Style TextBox</a>
         </li>
       
-        <li>
-          <a href="/blog/2014/11/29/wpf-13/">WPF パンくずリストで画面遷移</a>
-        </li>
-      
     </ul>
     <h2><a href="/blog/archives">archives</a></h2>
   </div>
 
   <div class="span3">
     <h2>category</h2>
-    <ul id="category-list"><li><a href='/blog/categories/jekyll-paginate/'>jekyll-paginate (1)</a></li><li><a href='/blog/categories/mef/'>mef (1)</a></li><li><a href='/blog/categories/wpf/'>wpf (14)</a></li><li><a href='/blog/categories/dezain/'>デザイン (1)</a></li></ul>
+    <ul id="category-list"><li><a href='/blog/categories/jekyll-paginate/'>jekyll-paginate (1)</a></li><li><a href='/blog/categories/mef/'>mef (1)</a></li><li><a href='/blog/categories/wpf/'>wpf (15)</a></li><li><a href='/blog/categories/dezain/'>デザイン (1)</a></li></ul>
   </div>
 
 
