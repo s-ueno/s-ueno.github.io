@@ -4,7 +4,7 @@
   <title><![CDATA[uEN Laboratory]]></title>
   <link href="http://s-ueno.github.io/atom.xml" rel="self"/>
   <link href="http://s-ueno.github.io/"/>
-  <updated>2017-06-11T19:18:48+09:00</updated>
+  <updated>2018-04-18T00:44:44+09:00</updated>
   <id>http://s-ueno.github.io/</id>
   <author>
     <name><![CDATA[uEN]]></name>
@@ -12,6 +12,126 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[XamarinやらTypeScriptやら]]></title>
+    <link href="http://s-ueno.github.io/blog/2018/04/14/info/"/>
+    <updated>2018-04-14T21:43:29+09:00</updated>
+    <id>http://s-ueno.github.io/blog/2018/04/14/info</id>
+    <content type="html"><![CDATA[<p>最近は<a href="https://www.microsoft.com/ja-jp/dev/campaign/vs-xamarin.aspx">Xamarin</a>や<a href="https://ja.wikipedia.org/wiki/TypeScript">TypeScript</a>といった先進的な環境でどっぷりエンタープライズ系のプロジェクトに従事していました。</p>
+
+<!-- more -->
+
+
+<h3>Xamarinについて</h3>
+
+<p><a href="https://www.microsoft.com/ja-jp/dev/campaign/vs-xamarin.aspx">Xamarin</a>ですが、当初はCrossPlatformと謳っていましたが、今はMSの公式サイトを見ての通りモバイル（iOS/Android）に特化していますね。
+これも後述するTypeScripが出てきたおかげでブラウザベースの大規模RIAが容易に作成できるようになり、Xamarinはモバイル(Native)の世界に特化したのだと思います。</p>
+
+<h4>良い話から</h4>
+
+<p>さて <a href="https://github.com/s-ueno/uENLab">Xamlerな私</a>は <a href="https://www.xlsoft.com/jp/products/xamarin/forms.html">Xamarin.Forms</a>という<a href="https://github.com/xamarin/Xamarin.Forms">Gitでも公開</a>されているUI用のOSSを迷わず選択しました。</p>
+
+<p>Xamarinとは、iOSやAndroidのNative機能をC#でラップして利用できるようにしてくれたライブラリです。</p>
+
+<p>Xamarin.<strong><em>Forms</em></strong>はその二つのデバイスから最小公倍数のUIコンポーネントを、XAMLで記述できるようにしてくれているUI部のOSSです。</p>
+
+<p>これらを利用して、モバイルのNativeアプリ開発にあたってUI部分をXAMLでデザイン、その他をC#で構築するコンポジットMVVMアプリケーションを、XAML+C#（ILも書いたけど）のみで完遂できました。</p>
+
+<p>（基盤や共通部は別にして、）アプリケーション開発者が作成するXAMLやViewModelに関しては、iOSとAndroidで100％近いコード共有率でした。
+　　※だって、XAMLと素のC#で記述するViewModelにプラットフォーム固有処理は出ないですし・・・</p>
+
+<p>これは凄いことです。</p>
+
+<p>ただ・・・・</p>
+
+<h4>デメリットについて</h4>
+
+<p>Xamarin.Formsは所謂デベロッパーな人間からはあまり良い印象がないのが悲しい限りです。
+というのも、<strong><em>基盤や共通部は別にして</em></strong> と記述したように、どこかしらで差分を吸収しないと開発がほぼできないと考えてよいです。</p>
+
+<p>単なるモックアプリ程度なら別にいらないのですが・・・</p>
+
+<p>そして、じゃぁ本気で開発するからそれらのプラットフォーム固有処理の吸収に基盤で向き合うよ！といって、OSSなXamarin.Formsのコードに向き合うと嫌われる理由が見えてきます。</p>
+
+<p>少し踏み込んで話すと、Xamarinはプラットフォーム固有ライブラリと前述した通り、Xamarin.iOSやXamarin.Androidといったより専門のライブラリに分かれます。
+これらはかなり高い完成度です。</p>
+
+<p>Xamarin.Formsはそれらを利用して、開発者がXAMLで書いたコードがiOSやAndroidでも動くように、橋渡し専用のクラスを設けています。</p>
+
+<p>これらを カスタムレンダラー といいます。</p>
+
+<p>私たちは主にカスタムレンダラーに向き合うのですが、<a href="https://github.com/xamarin/Xamarin.Forms/blob/master/Xamarin.Forms.Platform.Android/Renderers/TimePickerRenderer.cs">まぁだいたい全部がこんな感じ</a>。</p>
+
+<p>いや！Git hub に公開してくれているOSSなんで、みんなで良くして行こう！が本来の姿なのですが・・・</p>
+
+<p>そんな中で<a href="https://github.com/AvaloniaUI/Avalonia">Avalonia</a>とか生まれてきたり、<a href="https://insights.stackoverflow.com/survey/2017#technology-most-loved-dreaded-and-wanted-frameworks-libraries-and-other-technologies">物凄い人気</a>のReactから<a href="https://facebook.github.io/react-native/showcase.html">React Native</a>が出てきたり。</p>
+
+<p>というか <strong><em>SkypeはXamarin使いなさいよ！</em></strong></p>
+
+<p>あと、Xamarin.Formsに過度な期待をするのではなくて、やはりリッチなコンポーネントを（自力じゃなく）簡単に手に入れたいならサードパーティなどの選択肢もありますよ。</p>
+
+<h4>それでもXamarinは凄いよ</h4>
+
+<p>Androidに関しては、Monoで動いているのでILコードが入り混じっていても平気で動きます。
+エミュレーターまで提供してくれています。
+エミュレーターというくらいなので、普通にPC上でスマフォのAndroidOSが小さい画面上でそのまま動きます。</p>
+
+<p><img src="http://s-ueno.github.io/images/info-01.png" width="200"></p>
+
+<p>しかもVisualStudioからデバック実行できます。（ステップの移動できないけど）
+実機にUSBでぶっさしても動くし、デバック実行もできます。</p>
+
+<p>こういった　VisualStudio　による開発生産性や既存スキルがそのまま生かせるところは、十分に魅力的です。</p>
+
+<p>Xamarinについては、これから技術記事を投稿して、1技術者として盛り上げていこうと思います。</p>
+
+<p>　　</p>
+
+<h3>TypeScriptについて</h3>
+
+<p>ヘルスバーグが開発に携わっているというだけあって、もの凄いです。
+絶対C#から浮気しないと思っていたのですが、これはTypeScriptは良い意味でハマります。</p>
+
+<p>たとえば型付きにも拘わらず Tuple の柔軟性なんて、なんでC#はこうできなかったのか悔やまれるくらい凄いです。
+　※元がJSだから、本当はなんでもありなんだろうけど
+　</p>
+
+<p><img src="http://s-ueno.github.io/images/info-02.png" alt="info-02" /></p>
+
+<p>実体のないインターフェイスに動的にメソッド実態割り当て。インテリセンスもC#並み。</p>
+
+<p>そんなに凄くて、RIAで開発進むなら、モバイルもフレキシブルレイアウトなWEBでいいじゃん（ちっちゃくするとモバイル用Styleがあたる）となりそうですが、静的サイトなら全然ありだと思います。
+これもジャンルによるのですが、エンタープライズだと死にます。モバイルのブラウザやメモリが。</p>
+
+<p>Googleは<a href="https://developers.google.com/web/fundamentals/performance/prpl-pattern/?hl=ja">PRPLパターン</a>という興味深いデザインを提唱していますが、デスクトップ用に大量に作成したTypeScrip（JavaScript）がモバイル端末でサクサク動くのはキビシイです。</p>
+
+<p>そりゃ、ReactだってReact Native作るし、モバイルファーストを謳うなら絶対にNativeです。
+スマフォで利用者立場でハイブリットAPP(アプリの外枠だけNativeで中身はWEB)使ってて、ログインを二回聞かれたり、やたらと重くてイライラしたりすることはよくあります。</p>
+
+<p>（スマフォを利用する上で）基本的に静的サイト（参照オンリー）じゃない、入力を求められる系はやはりNativeとWebでは一線を画します。</p>
+
+<p>TypeScriptについても、技術記事を執筆したいと思います。</p>
+
+<p>もう日付も変わってきたので、そろそろお休みします。</p>
+
+<p>余談①</p>
+
+<p>このブログは Octopress を利用してGit hub Pages上に生成しているのですが、3年ぶりに使おうと思ってもRubyのコマンド全部忘れてて、ブログを投稿するまでに時間がかかりました。</p>
+
+<p>でも、使ってると rake preview でMarkdownで書きながらプレビューする機能とか、やっぱり便利。</p>
+
+<p>余談②</p>
+
+<p>二日くらい前に、トヨ〇レンタカーからスマフォアプリを配信したニュースがデカデカと来てました。
+『開発者は大変だったろうけど、うれしいだろうなぁ』とか、『まだまだビジネスチャンスあるんじゃ？』とか思っていました。</p>
+
+<p>そしたら、今日アプリがつながらなくてごめんなさいメール来てた。
+なんか開発者や現場の苦労がしのばれて、切ない気持ちになりました。</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[WPF DataGridの自動生成]]></title>
